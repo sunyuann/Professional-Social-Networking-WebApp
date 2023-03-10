@@ -1,28 +1,89 @@
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
     <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <title>LurkForWork</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <!-- You can add your styles and scripts here -->
-    <link rel="stylesheet" type="text/css" media="screen" href="styles/provided.css" />
-</head>
-<body>
-    <!-- This is an example app structure, you can modify this as much as you choose --> 
+    <link
+      rel="stylesheet"
+      type="text/css"
+      media="screen"
+      href="styles/global.css"
+    />
+  </head>
+  <body>
+    <!-- This is an example app structure, you can modify this as much as you choose -->
     <header>
-        <h1>lurkforwork.com</h1>
-        <nav>
-            <li class="nav-item">Item</li>
-            <li class="nav-item">Item</li>
-        </nav>
+      <h1>lurkforwork.com</h1>
+      <nav>
+        <li class="nav-item">Item</li>
+        <li class="nav-item">Item</li>
+      </nav>
     </header>
     <main role="main">
-        <!-- app goes here --> 
+      <!-- app goes here -->
+
+      <!-- Login screen -->
+      <div id="login-screen" class="hidden">
+        <form id="login-form" method="POST" action="/auth/login">
+          <div class="form-entry">
+            <label for="login-email">Email:</label>
+            <input type="text" id="login-email" />
+          </div>
+          <div class="form-entry">
+            <label for="login-password">Password:</label>
+            <input type="password" id="login-password" />
+          </div>
+          <input type="button" value="Login" id="login-login" />
+          <input type="button" value="Register" id="login-register" />
+        </form>
+      </div>
+
+      <!-- Register screen -->
+      <div id="register-screen" class="hidden">
+        <form id="register-form" method="POST" action="/auth/register">
+          <div class="form-entry">
+            <label for="register-email">Email:</label>
+            <input type="text" id="register-email" />
+          </div>
+          <div class="form-entry">
+            <label for="register-email">Name:</label>
+            <input type="text" id="register-name" />
+          </div>
+          <div class="form-entry">
+            <label for="register-password">Password:</label>
+            <input type="password" id="register-password" />
+          </div>
+          <div class="form-entry">
+            <label for="register-password-confirm">Confirm Password:</label>
+            <input type="password" id="register-password-confirm" />
+          </div>
+          <input type="button" value="Register" id="register-register" />
+          <input type="button" value="Back" id="register-back" />
+        </form>
+      </div>
+
+      <!-- Error popup -->
+      <div id="error-popup" class="centered hidden">
+        <div id="error-content">Dummy text</div>
+        <button id="error-close">Close</button>
+      </div>
+
+      <!-- Feed -->
+
+      <!-- Profile page -->
+
+      <!-- Update profile page -->
+
+      <!-- Adding a job -->
+
+      <!-- Updating & deleting a job -->
     </main>
     <footer>
-        <p>&copy; lurkforwork.com 2022</p>
+      <p>&copy; lurkforwork.com 2022</p>
     </footer>
     <script type="module" src="src/main.js"></script>
-</body>
+  </body>
 </html>
