@@ -29,13 +29,3 @@ export function fileToDataUrl(file) {
     reader.readAsDataURL(file);
     return dataUrlPromise;
 }
-
-// changes visibility of password
-function show_password() {
-    var x = document.getElementById("login-password");
-    if (x.type === "password") {
-      x.type = "text";
-    } else {
-      x.type = "password";
-    }
-  }

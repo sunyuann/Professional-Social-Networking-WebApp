@@ -89,6 +89,17 @@
       <p>&copy; lurkforwork.com 2022</p>
     </footer>
     <script type="module" src="src/main.js"></script>
-    <script type="module" src="src/helpers.js"></script>
+    <script>
+      ///// TODO: Put this chunk of code in helper, don't know why it doesn't work when I put it there and include the file though, figure out**
+      // changes visibility of password
+      function show_password() {
+        var login_password = document.getElementById("login-password");
+        if (login_password.type === "password") {
+          login_password.type = "text";
+        } else {
+          login_password.type = "password";
+        }
+      }
+    </script>
   </body>
 </html>
