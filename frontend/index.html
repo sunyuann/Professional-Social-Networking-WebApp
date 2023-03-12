@@ -26,7 +26,10 @@
       <!-- app goes here -->
 
       <!-- Login screen -->
-      <div id="login-screen" class="hidden">
+      <div id="login-screen">
+        <h2>Log In</h2>
+        <h4>Stay updated on your professional world!</h4>
+
         <form id="login-form" method="POST" action="/auth/login">
           <div class="form-entry">
             <label for="login-email">Email:</label>
@@ -35,6 +38,7 @@
           <div class="form-entry">
             <label for="login-password">Password:</label>
             <input type="password" id="login-password" />
+            <input type="checkbox" onclick="show_password()">Show Password
           </div>
           <input type="button" value="Login" id="login-login" />
           <input type="button" value="Register" id="login-register" />
@@ -85,5 +89,6 @@
       <p>&copy; lurkforwork.com 2022</p>
     </footer>
     <script type="module" src="src/main.js"></script>
+    <script type="module" src="src/helpers.js"></script>
   </body>
 </html>
