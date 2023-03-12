@@ -1,7 +1,58 @@
 /* base styles, feel free to edit */
+/*
 html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    font-family: Arial;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: Arial;
 }
+*/
+nav {
+  display: none;
+}
+.hidden {
+  display: none;
+}
+.centered {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  text-align: center;
+}
+
+/* Login screen */
+#login-form {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+/* Register screen */
+#register-form {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+/* Error popup*/
+#error-popup {
+  border: 5px red solid;
+  width: fit-content;
+  padding: 10px;
+  background-color: white;
+}
+#error-content {
+  padding: 10px;
+}
+
+/* Feed */
+
+/* Profile page */
+
+/* Update profile page */
+
+/* Adding a job */
+
+/* Updating & deleting a job */
