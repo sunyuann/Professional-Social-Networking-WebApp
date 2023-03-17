@@ -24,6 +24,10 @@ const hide = (element) => {
 const populateFeed = () => {
   apiCall("job/feed", "GET", { start: 0 }, (data) => {
     const baseFeedItem = document.getElementById("feed-item");
+    // Sort recent jobs first
+    data.sort((a, b) => {
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    });
     for (const feedItem of data) {
       const feedDom = baseFeedItem.cloneNode(true);
       // Remove ID and hide class
@@ -47,6 +51,13 @@ const populateFeed = () => {
         .catch((error) => {
           console.log("TODO populateFeed getUserDetails ERROR! ", error);
         });
+      // Update job created string
+      let createStr = feedItem.createdAt.split("T")[0];
+      const [hours, minutes] = getHoursMinutesSince(feedItem.createdAt);
+      if (hours < 24) {
+        createStr = `${hours} hours, ${minutes} minutes ago`;
+      }
+      feedDom.querySelector(".feed-created").innerText = createStr;
       // Put the thing in the thing
       document.getElementById("feed-items").appendChild(feedDom);
     }
@@ -102,6 +113,15 @@ const getUserDetails = (userId) => {
       resolve(data);
     });
   });
+};
+
+// Returns [hours, minutes] where hours and minutes are ints
+const getHoursMinutesSince = (datetimestr) => {
+  const ms = new Date() - new Date(datetimestr);
+  let minutes = Math.floor(ms / 1000 / 60);
+  const hours = Math.floor(minutes / 60);
+  minutes = minutes - hours * 60;
+  return [hours, minutes];
 };
 
 ////////////////////////////////
