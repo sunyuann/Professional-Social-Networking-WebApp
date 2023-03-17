@@ -1,3 +1,5 @@
+import { BACKEND_PORT } from "./config.js";
+
 /**
  * Given a js file object representing a jpg or png image, such as one taken
  * from a html file input element, return a promise which resolves to the file
@@ -51,17 +53,19 @@ export const apiCall = (path, method, body, success) => {
     options.headers.Authorization = `Bearer ${localStorage.getItem("token")}`;
   }
 
-  fetch("http://localhost:5005/" + path, options).then((response) => {
-    response.json().then((data) => {
-      if (data.error) {
-        errorShow(data.error);
-      } else {
-        if (success) {
-          success(data);
+  fetch(`http://localhost:${BACKEND_PORT}/` + path, options).then(
+    (response) => {
+      response.json().then((data) => {
+        if (data.error) {
+          errorShow(data.error);
+        } else {
+          if (success) {
+            success(data);
+          }
         }
-      }
-    });
-  });
+      });
+    }
+  );
 };
 
 // Returns GET /user dictionary response from server
