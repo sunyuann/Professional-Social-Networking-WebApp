@@ -11,9 +11,6 @@ html, body {
   cursor: pointer;
 }
 
-.hide {
-  display: none;
-}
 .centered {
   position: absolute;
   top: 50%;
@@ -50,6 +47,30 @@ html, body {
 }
 
 /* Feed */
+#feed-items {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+.feed-item {
+  display: flex;
+  border: 1px black solid;
+  padding: 10px;
+}
+.feed-image {
+  flex: 1;
+}
+.feed-text {
+  flex: 3;
+}
+.clickable {
+  color: #1567c0;
+}
+.clickable:hover {
+  text-decoration-line: underline;
+  cursor: pointer;
+}
 
 /* Profile page */
 
@@ -58,3 +79,8 @@ html, body {
 /* Adding a job */
 
 /* Updating & deleting a job */
+
+/* At the bottom so it overrides the above */
+.hide {
+  display: none;
+}
