@@ -7,10 +7,11 @@ html, body {
   font-family: Arial;
 }
 */
-nav {
-  display: none;
+.nav-item:hover {
+  cursor: pointer;
 }
-.hidden {
+
+.hide {
   display: none;
 }
 .centered {
@@ -20,7 +21,7 @@ nav {
   text-align: center;
 }
 
-/* Login screen */
+/* Login page */
 #login-form {
   display: flex;
   flex-direction: column;
@@ -28,7 +29,7 @@ nav {
   gap: 10px;
 }
 
-/* Register screen */
+/* Register page */
 #register-form {
   display: flex;
   flex-direction: column;
@@ -39,6 +40,7 @@ nav {
 /* Error popup*/
 #error-popup {
   border: 5px red solid;
+  border-radius: 10px;
   width: fit-content;
   padding: 10px;
   background-color: white;
