@@ -1,6 +1,11 @@
 import { BACKEND_PORT } from "./config.js";
 // A helper you may want to use when uploading new images to the server.
-import { fileToDataUrl } from "./helpers.js";
+import {
+  fileToDataUrl,
+  apiCall,
+  getUserDetails,
+  getHoursMinutesSince,
+} from "./helpers.js";
 
 ///////////////
 // Functions //
@@ -71,57 +76,6 @@ const setToken = (token) => {
   hide("section-logged-out");
   hide("error-popup");
   populateFeed();
-};
-
-// api call function
-const apiCall = (path, method, body, success) => {
-  const options = {
-    method: method,
-    headers: {
-      "Content-type": "application/json",
-    },
-  };
-  if (method === "GET") {
-    path += "?";
-    for (const key in body) {
-      path += key + "=" + body[key] + "&";
-    }
-    path = path.substring(0, path.length - 1);
-  } else {
-    options.body = JSON.stringify(body);
-  }
-  if (localStorage.getItem("token")) {
-    options.headers.Authorization = `Bearer ${localStorage.getItem("token")}`;
-  }
-
-  fetch("http://localhost:5005/" + path, options).then((response) => {
-    response.json().then((data) => {
-      if (data.error) {
-        errorShow(data.error);
-      } else {
-        if (success) {
-          success(data);
-        }
-      }
-    });
-  });
-};
-
-const getUserDetails = (userId) => {
-  return new Promise((resolve, reject) => {
-    apiCall("user", "GET", { userId: userId }, (data) => {
-      resolve(data);
-    });
-  });
-};
-
-// Returns [hours, minutes] where hours and minutes are ints
-const getHoursMinutesSince = (datetimestr) => {
-  const ms = new Date() - new Date(datetimestr);
-  let minutes = Math.floor(ms / 1000 / 60);
-  const hours = Math.floor(minutes / 60);
-  minutes = minutes - hours * 60;
-  return [hours, minutes];
 };
 
 ////////////////////////////////
