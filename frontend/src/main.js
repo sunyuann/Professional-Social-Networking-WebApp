@@ -35,16 +35,17 @@ const populateFeed = () => {
       feedDom.querySelector(".feed-start").innerText = feedItem.start;
       feedDom.querySelector(".feed-description").innerText =
         feedItem.description;
-      feedDom.querySelector(".feed-likes").innerText = feedItem.likes.length;
+      feedDom.querySelector(".feed-likes").innerText =
+        "Likes: " + feedItem.likes.length;
       feedDom.querySelector(".feed-comments").innerText =
-        feedItem.comments.length;
+        "Comments: " + feedItem.comments.length;
       // Fetch creator name and update
       getUserDetails(feedItem.creatorId)
         .then((creator) => {
           feedDom.querySelector(".feed-creator").innerText = creator.name;
         })
         .catch((error) => {
-          console.log("populateFeed getUserDetails ERROR! ", error);
+          console.log("TODO populateFeed getUserDetails ERROR! ", error);
         });
       // Put the thing in the thing
       document.getElementById("feed-items").appendChild(feedDom);

@@ -64,6 +64,13 @@ html, body {
 .feed-text {
   flex: 3;
 }
+.clickable {
+  color: #1567c0;
+}
+.clickable:hover {
+  text-decoration-line: underline;
+  cursor: pointer;
+}
 
 /* Profile page */
 
