@@ -23,7 +23,7 @@
     <!-- This is an example app structure, you can modify this as much as you choose -->
     <header>
       <h1>lurkforwork.com</h1>
-      <nav>
+      <nav class="hide">
         <li class="nav-item" id="nav-register">Register</li>
         <li class="nav-item" id="nav-login">Login</li>
       </nav>
@@ -79,6 +79,12 @@
               value="Register"
               id="register-register"
             />
+            <input
+              type="button"
+              class="btn btn-primary"
+              value="Already have an account? Login here"
+              id="register-login"
+            />
           </form>
         </div>
         <!-- Login screen -->
@@ -86,7 +92,7 @@
           <h2>Log In</h2>
           <form id="login-form" method="POST" action="/auth/login">
             <div class="form-group">
-              <label for="login-email">Email:</label>
+              <label for="login-email">Email</label>
               <input
                 type="text"
                 class="form-control"
@@ -95,7 +101,7 @@
               />
             </div>
             <div class="form-group">
-              <label for="login-password">Password:</label>
+              <label for="login-password">Password</label>
               <input
                 type="password"
                 class="form-control"
@@ -119,6 +125,12 @@
               value="Login"
               id="login-login"
             />
+            <input
+              type="button"
+              class="btn btn-primary"
+              value="Don't have an account? Register here"
+              id="login-register"
+            />
           </form>
         </div>
       </section>
@@ -128,6 +140,7 @@
         <h3>Yay! Logged in :p</h3>
 
         <!-- Feed -->
+        <h4>Job Feed</h4>
         <div id="feed-items">
           <div id="feed-item" class="feed-item hide">
             <img
@@ -143,8 +156,14 @@
                 DESCRIPTION: This is a dummy job
               </div>
               <div class="feed-likes clickable">LIKES: 500</div>
+              <div class="feed-likes-list hide">FEED LIKES LIST</div>
               <div class="feed-comments clickable">COMMENTS: 2</div>
+              <div class="feed-comments-list hide">FEED COMMENTS LIST</div>
               <div class="feed-created">01/01/2023</div>
+              <input type="button" class="feed-like-button btn btn-primary" value="Like"/>
+              <!-- <label for="feed-comment">Place your comment here</label> -->
+              <input type="text" class="feed-comment form-control" id="feed-comment" placeholder="Leave a comment here"/>
+              <input type="button" class="feed-comment-button btn btn-primary" value="Post comment"/>
             </div>
           </div>
         </div>

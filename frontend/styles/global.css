@@ -1,12 +1,12 @@
 /* base styles, feel free to edit */
-/*
+
 html, body {
-  margin: 0;
+  margin: 20px;
   padding: 0;
   height: 100%;
   font-family: Arial;
 }
-*/
+
 .nav-item:hover {
   cursor: pointer;
 }
@@ -36,6 +36,8 @@ html, body {
 
 /* Error popup*/
 #error-popup {
+  position: fixed;
+  left: 45%;
   border: 5px red solid;
   border-radius: 10px;
   width: fit-content;
