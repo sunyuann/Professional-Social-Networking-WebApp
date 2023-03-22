@@ -93,3 +93,8 @@ export const getUserDetails = (userId) => {
     });
   });
 };
+// show error
+export const errorShow = (content) => {
+  document.getElementById("error-popup").classList.remove("hide");
+  document.getElementById("error-content").textContent = content;
+};

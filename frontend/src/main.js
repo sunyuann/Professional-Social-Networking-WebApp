@@ -5,19 +5,12 @@ import {
   cloneNode,
   getHoursMinutesSince,
   getUserDetails,
+  errorShow,
 } from "./helpers.js";
 
 ///////////////
 // Functions //
 ///////////////
-const errorShow = (content) => {
-  document.getElementById("error-popup").classList.remove("hide");
-  document.getElementById("error-content").textContent = content;
-};
-
-const isUserLoggedIn = () => {
-  return false;
-};
 
 const show = (element) => {
   document.getElementById(element).classList.remove("hide");
@@ -268,6 +261,7 @@ document.getElementById("login-login").addEventListener("click", () => {
   };
   apiCall("auth/login", "POST", payload, (data) => {
     setToken(data.token);
+    hide("error-popup");
   });
 });
 
@@ -313,9 +307,28 @@ document.getElementById("error-close").addEventListener("click", () => {
 });
 
 // Navbar register, show register page
-document.getElementById("nav-register").addEventListener("click", () => {
-  show("page-register");
-  hide("page-login");
+// document.getElementById("nav-register").addEventListener("click", () => {
+//   show("page-register");
+//   hide("page-login");
+// });
+
+// Navbar Job Feed, show job feed page
+document.getElementById("nav-job-feed").addEventListener("click", () => {
+  show("page-job-feed");
+  hide("page-job-post");
+});
+
+// Navbar Create Job, show job post page
+document.getElementById("nav-job-post").addEventListener("click", () => {
+  show("page-job-post");
+  hide("page-job-feed");
+});
+
+// Navbar Me, show your profile page
+document.getElementById("nav-profile-me").addEventListener("click", () => {
+  showProfile(97467); // TODO save logged in userId
+  hide("page-job-feed");
+  hide("page-job-post");
 });
 
 // Register page, login button
@@ -332,11 +345,11 @@ document.getElementById("login-register").addEventListener("click", () => {
   hide("page-login");
 });
 
-// Login register, show login page
-document.getElementById("nav-login").addEventListener("click", () => {
-  show("page-login");
-  hide("page-register");
-});
+// // Login register, show login page
+// document.getElementById("nav-login").addEventListener("click", () => {
+//   show("page-login");
+//   hide("page-register");
+// });
 
 // if token does not exist, display logged out section
 document.getElementById("logout").addEventListener("click", () => {
@@ -345,16 +358,41 @@ document.getElementById("logout").addEventListener("click", () => {
   localStorage.removeItem("token");
 });
 
-document.getElementById("create-job-fake").addEventListener("click", () => {
-  const payload = {
-    title: "TETS",
-    image:
-      "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==",
-    start: "2011-10-05T14:48:00.000Z",
-    description:
-      "Dedicated technical wizard with a passion and interest in human relationships",
-  };
-  apiCall("job", "POST", payload);
+// creating job
+document.getElementById("create-job").addEventListener("click", () => {
+  const title = document.getElementById("job-post-title").value;
+  const description = document.getElementById("job-post-description").value;
+  // error checking
+  if (title === "") {
+    errorShow("Please enter a title");
+    return;
+  } else if (document.querySelector("#job-post-image").files.length === 0) {
+    errorShow("Please upload an image");
+    return;
+  } else if (description === "") {
+    errorShow("Please enter a description");
+    return;
+  }
+  // convert to base64, then create job
+  const image_file = document.querySelector("#job-post-image").files[0];
+  fileToDataUrl(image_file)
+    .then((image) => {
+      const payload = {
+        title: title,
+        image: image,
+        start: new Date().toISOString(),
+        description: description,
+      };
+      apiCall("job", "POST", payload, () => {
+        document.getElementById("job-post-title").value = "";
+        document.getElementById("job-post-description").value = "";
+        document.getElementById("job-post-image").value = "";
+      });
+      hide("error-popup");
+    })
+    .catch((error) => {
+      console.log("Image not found", error);
+    });
 });
 
 ////////////////
@@ -367,3 +405,5 @@ if (localStorage.getItem("token")) {
   populateFeed();
   console.log(localStorage.getItem("token"));
 }
+const curr_date = new Date();
+console.log(new Date().toISOString());
