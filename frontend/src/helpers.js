@@ -68,6 +68,12 @@ export const apiCall = (path, method, body, success) => {
   );
 };
 
+export const clearChildren = (element) => {
+  while (element.firstChild) {
+    element.removeChild(element.firstChild);
+  }
+};
+
 // Deep clone and removes id, class "hide"
 export const cloneNode = (element) => {
   const newElem = element.cloneNode(true);
