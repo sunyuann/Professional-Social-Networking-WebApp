@@ -54,20 +54,13 @@ const createJobElement = (jobDetail, isJob = false) => {
     }
   }
   feedDom.querySelector(".feed-likes-start").innerText = likeStart;
-  feedDom
-    .querySelector(".feed-likes-list")
-    .setAttribute("id", "feed-likes-list_" + jobDetail.id);
   // toggling show and hide feed likes list
   feedDom.querySelector(".feed-likes").addEventListener("click", () => {
-    // toggling show and hide feed likes list
-    if (
-      document
-        .getElementById("feed-likes-list_" + jobDetail.id)
-        .classList.contains("hide")
-    ) {
-      show("feed-likes-list_" + jobDetail.id);
+    console.log("likedList:", likedList);
+    if (likedList.classList.contains("hide")) {
+      likedList.classList.remove("hide");
     } else {
-      hide("feed-likes-list_" + jobDetail.id);
+      likedList.classList.add("hide");
     }
   });
 
@@ -120,42 +113,30 @@ const createJobElement = (jobDetail, isJob = false) => {
     }
     comments_list = comments_list.substring(0, comments_list.length);
   }
-  feedDom.querySelector(".feed-comments-list").innerText = comments_list;
-  feedDom
-    .querySelector(".feed-comments-list")
-    .setAttribute("id", "feed-comments-list_" + jobDetail.id);
+  const commentsListDom = feedDom.querySelector(".feed-comments-list");
+  commentsListDom.innerText = comments_list;
   // toggling show and hide feed comments list
   feedDom.querySelector(".feed-comments").addEventListener("click", () => {
-    // toggling show and hide feed likes list
-    if (
-      document
-        .getElementById("feed-comments-list_" + jobDetail.id)
-        .classList.contains("hide")
-    ) {
-      show("feed-comments-list_" + jobDetail.id);
+    if (commentsListDom.classList.contains("hide")) {
+      commentsListDom.classList.remove("hide");
     } else {
-      hide("feed-comments-list_" + jobDetail.id);
+      commentsListDom.classList.add("hide");
     }
   });
 
   // post comment
-  feedDom
-    .querySelector(".feed-comment")
-    .setAttribute("id", "feed-comment_" + jobDetail.id);
+  const feedComment = feedDom.querySelector(".feed-comment");
   feedDom
     .querySelector(".feed-comment-button")
     .addEventListener("click", () => {
       // post comment button
-      if (
-        document.getElementById("feed-comment_" + jobDetail.id).value !== ""
-      ) {
+      if (feedComment.value !== "") {
         const payload = {
           id: jobDetail.id,
-          comment: document.getElementById("feed-comment_" + jobDetail.id)
-            .value,
+          comment: feedComment.value,
         };
         apiCall("job/comment", "POST", payload, () => {
-          document.getElementById("feed-comment_" + jobDetail.id).value = "";
+          feedComment.value = "";
         });
         hide("error-popup");
       } else {
