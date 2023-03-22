@@ -191,7 +191,7 @@ const populateFeed = () => {
 const showProfile = (userId) => {
   hideAll();
   const btn = document.getElementById("profile-edit");
-  if (userId === localStorage.getItem("userId")) {
+  if (userId == localStorage.getItem("userId")) {
     btn.classList.remove("hide");
   } else {
     btn.classList.add("hide");
