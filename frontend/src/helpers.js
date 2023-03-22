@@ -69,8 +69,12 @@ export const apiCall = (path, method, body, success) => {
 };
 
 export const clearChildren = (element) => {
-  while (element.firstChild) {
-    element.removeChild(element.firstChild);
+  const children = element.children;
+  for (let i = children.length - 1; i >= 0; i--) {
+    const child = children[i];
+    if (!child.classList.contains("hide")) {
+      element.removeChild(child);
+    }
   }
 };
 

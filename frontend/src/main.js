@@ -56,7 +56,6 @@ const createJobElement = (jobDetail, isJob = false) => {
   feedDom.querySelector(".feed-likes-start").innerText = likeStart;
   // toggling show and hide feed likes list
   feedDom.querySelector(".feed-likes").addEventListener("click", () => {
-    console.log("likedList:", likedList);
     if (likedList.classList.contains("hide")) {
       likedList.classList.remove("hide");
     } else {
@@ -198,6 +197,7 @@ const showProfile = (userId) => {
   getUserDetails(userId)
     .then((user) => {
       const pp = document.getElementById("profile-page");
+      pp.querySelector("#profile-userid").innerText = user.id;
       pp.querySelector("#profile-email").innerText = user.email;
       pp.querySelector("#profile-name").innerText = user.name;
       pp.querySelector("#profile-image").innerText = user.image;
@@ -207,7 +207,7 @@ const showProfile = (userId) => {
       const watchName = pp.querySelector(".profile-watched-name");
       const watchSep = pp.querySelector(".profile-watched-sep");
       let watchString = `Watched by ${user.watcheeUserIds.length} users`;
-      watchString += `${user.watcheeUserIds.length > 0 ? ":" : "."}`;
+      watchString += `${user.watcheeUserIds.length > 0 ? ": " : "."}`;
       watchStart.innerText = watchString;
       clearChildren(watchList);
       watchList.append(watchStart);
@@ -239,6 +239,10 @@ const showProfile = (userId) => {
         jobs.innerText = "No jobs.";
       } else {
         jobs.innerText = "Jobs:";
+        // Most recent first
+        user.jobs.sort((a, b) => {
+          return new Date(b.createdAt) - new Date(a.createdAt);
+        });
         for (const job of user.jobs) {
           const jobDom = createJobElement(job, true);
           jobs.appendChild(jobDom);
@@ -251,8 +255,10 @@ const showProfile = (userId) => {
   show("profile-page");
 };
 
-const setToken = (token) => {
+// Save token and userId
+const setToken = (token, userId) => {
   localStorage.setItem("token", token);
+  localStorage.setItem("userId", userId);
   show("section-logged-in");
   hide("section-logged-out");
   hide("error-popup");
@@ -271,7 +277,7 @@ document.getElementById("login-login").addEventListener("click", () => {
     password: document.getElementById("login-password").value,
   };
   apiCall("auth/login", "POST", payload, (data) => {
-    setToken(data.token);
+    setToken(data.token, data.userId);
     hide("error-popup");
   });
 });
@@ -307,7 +313,7 @@ document.getElementById("register-register").addEventListener("click", () => {
     name: document.getElementById("register-name").value,
   };
   apiCall("auth/register", "POST", payload, (data) => {
-    setToken(data.token);
+    setToken(data.token, userId);
   });
   //document.getElementById("register-form").submit();
 });
@@ -337,7 +343,7 @@ document.getElementById("nav-job-post").addEventListener("click", () => {
 
 // Navbar Me, show your profile page
 document.getElementById("nav-profile-me").addEventListener("click", () => {
-  showProfile(97467); // TODO save logged in userId
+  showProfile(localStorage.getItem("userId"));
 });
 
 // Register page, login button
@@ -365,6 +371,7 @@ document.getElementById("logout").addEventListener("click", () => {
   show("section-logged-out");
   hide("section-logged-in");
   localStorage.removeItem("token");
+  localStorage.removeItem("userId");
 });
 
 // creating job
@@ -407,7 +414,7 @@ document.getElementById("create-job").addEventListener("click", () => {
 ////////////////
 // Main logic //
 ////////////////
-if (localStorage.getItem("token")) {
+if (localStorage.getItem("token") && localStorage.getItem("userId")) {
   show("section-logged-in");
   hide("section-logged-out");
   hide("error-popup");
