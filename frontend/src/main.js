@@ -49,20 +49,25 @@ const populateFeed = () => {
       let likes_list = "";
       if (feedItem.likes.length === 0) {
         likes_list += "Liked by no one";
-      }
-      else {
+      } else {
         likes_list += "Liked by ";
         for (var i = 0; i < feedItem.likes.length; i++) {
           likes_list = likes_list + feedItem.likes[i].userName + ", ";
         }
-        likes_list = likes_list.substring(0, likes_list.length-2)
+        likes_list = likes_list.substring(0, likes_list.length - 2);
       }
       feedDom.querySelector(".feed-likes-list").innerText = likes_list;
-      feedDom.querySelector(".feed-likes-list").setAttribute('id', 'feed-likes-list_' + feedItem.id);
+      feedDom
+        .querySelector(".feed-likes-list")
+        .setAttribute("id", "feed-likes-list_" + feedItem.id);
       // toggling show and hide feed likes list
       feedDom.querySelector(".feed-likes").addEventListener("click", () => {
         // toggling show and hide feed likes list
-        if (document.getElementById("feed-likes-list_" + feedItem.id).classList.contains("hide")) {
+        if (
+          document
+            .getElementById("feed-likes-list_" + feedItem.id)
+            .classList.contains("hide")
+        ) {
           show("feed-likes-list_" + feedItem.id);
         } else {
           hide("feed-likes-list_" + feedItem.id);
@@ -83,42 +88,55 @@ const populateFeed = () => {
       }
       likeButtonTurnOn = !likeButtonTurnOn;
       // like button
-      feedDom.querySelector(".feed-like-button").setAttribute('id', 'feed-like-button_' + feedItem.id);
-      feedDom.querySelector(".feed-like-button").addEventListener('click', () => {
-        // like/dislike button
-        const payload = {
-          id: feedItem.id,
-          turnon: !likeButtonTurnOn,
-        };
-        apiCall("job/like", "PUT", payload, () => {
+      feedDom
+        .querySelector(".feed-like-button")
+        .setAttribute("id", "feed-like-button_" + feedItem.id);
+      feedDom
+        .querySelector(".feed-like-button")
+        .addEventListener("click", () => {
+          // like/dislike button
+          const payload = {
+            id: feedItem.id,
+            turnon: !likeButtonTurnOn,
+          };
+          apiCall("job/like", "PUT", payload, () => {});
+          if (likeButtonTurnOn) {
+            feedDom.querySelector(".feed-like-button").value = "Like";
+          } else {
+            feedDom.querySelector(".feed-like-button").value = "Unlike";
+          }
+          likeButtonTurnOn = !likeButtonTurnOn;
         });
-        if (likeButtonTurnOn) {
-          feedDom.querySelector(".feed-like-button").value = "Like";
-        } else {
-          feedDom.querySelector(".feed-like-button").value = "Unlike";
-        }
-        likeButtonTurnOn = !likeButtonTurnOn;
-      });
 
       feedDom.querySelector(".feed-comments").innerText =
         "Comments: " + feedItem.comments.length;
       // get comment list
       let comments_list = "";
       if (feedItem.comments.length === 0) {
-        comments_list += "No comments yet"
-      }
-      else {
+        comments_list += "No comments yet";
+      } else {
         for (var i = 0; i < feedItem.comments.length; i++) {
-          comments_list = comments_list + feedItem.comments[i].userName + ": " + feedItem.comments[i].comment + "\n";
+          comments_list =
+            comments_list +
+            feedItem.comments[i].userName +
+            ": " +
+            feedItem.comments[i].comment +
+            "\n";
         }
-        comments_list = comments_list.substring(0, comments_list.length)
+        comments_list = comments_list.substring(0, comments_list.length);
       }
       feedDom.querySelector(".feed-comments-list").innerText = comments_list;
-      feedDom.querySelector(".feed-comments-list").setAttribute('id', 'feed-comments-list_' + feedItem.id);
+      feedDom
+        .querySelector(".feed-comments-list")
+        .setAttribute("id", "feed-comments-list_" + feedItem.id);
       // toggling show and hide feed comments list
       feedDom.querySelector(".feed-comments").addEventListener("click", () => {
         // toggling show and hide feed likes list
-        if (document.getElementById("feed-comments-list_" + feedItem.id).classList.contains("hide")) {
+        if (
+          document
+            .getElementById("feed-comments-list_" + feedItem.id)
+            .classList.contains("hide")
+        ) {
           show("feed-comments-list_" + feedItem.id);
         } else {
           hide("feed-comments-list_" + feedItem.id);
@@ -126,24 +144,30 @@ const populateFeed = () => {
       });
 
       // post comment
-      feedDom.querySelector(".feed-comment").setAttribute('id', 'feed-comment_' + feedItem.id);
-      feedDom.querySelector(".feed-comment-button").addEventListener('click', () => {
-        // post comment button
-        if (document.getElementById('feed-comment_' + feedItem.id).value !== "") {
-          const payload = {
-            id: feedItem.id,
-            comment: document.getElementById('feed-comment_' + feedItem.id).value,
-          };
-          apiCall("job/comment", "POST", payload, () => {
-            document.getElementById('feed-comment_' + feedItem.id).value = "";
-          });
-          hide('error-popup');
-        } else {
-          // case if comment box empty
-          errorShow("Comment can't be empty, please try again.")
-        }
-      });
-      
+      feedDom
+        .querySelector(".feed-comment")
+        .setAttribute("id", "feed-comment_" + feedItem.id);
+      feedDom
+        .querySelector(".feed-comment-button")
+        .addEventListener("click", () => {
+          // post comment button
+          if (
+            document.getElementById("feed-comment_" + feedItem.id).value !== ""
+          ) {
+            const payload = {
+              id: feedItem.id,
+              comment: document.getElementById("feed-comment_" + feedItem.id)
+                .value,
+            };
+            apiCall("job/comment", "POST", payload, () => {
+              document.getElementById("feed-comment_" + feedItem.id).value = "";
+            });
+            hide("error-popup");
+          } else {
+            // case if comment box empty
+            errorShow("Comment can't be empty, please try again.");
+          }
+        });
 
       // Fetch creator name and update
       getUserDetails(feedItem.creatorId)
@@ -186,9 +210,7 @@ document.getElementById("login-login").addEventListener("click", () => {
     email: document.getElementById("login-email").value,
     password: document.getElementById("login-password").value,
   };
-  apiCall("auth/login", "POST", payload, () => {
-    
-  });
+  apiCall("auth/login", "POST", payload, () => {});
 });
 
 // Login page, toggle show/hide passwords (optional??)
