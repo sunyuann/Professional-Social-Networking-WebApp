@@ -85,3 +85,9 @@ export const getHoursMinutesSince = (datetimestr) => {
   minutes = minutes - hours * 60;
   return [hours, minutes];
 };
+
+// show error
+export const errorShow = (content) => {
+  document.getElementById("error-popup").classList.remove("hide");
+  document.getElementById("error-content").textContent = content;
+};

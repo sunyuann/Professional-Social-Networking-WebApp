@@ -23,10 +23,6 @@
     <!-- This is an example app structure, you can modify this as much as you choose -->
     <header>
       <h1>lurkforwork.com</h1>
-      <nav class="hide">
-        <li class="nav-item" id="nav-register">Register</li>
-        <li class="nav-item" id="nav-login">Login</li>
-      </nav>
     </header>
     <main role="main">
       <!-- app goes here -->
@@ -88,7 +84,7 @@
           </form>
         </div>
         <!-- Login screen -->
-        <div id="page-login" class="">
+        <div id="page-login">
           <h2>Log In</h2>
           <form id="login-form" method="POST" action="/auth/login">
             <div class="form-group">
@@ -137,33 +133,41 @@
 
       <!-- Logged in section -->
       <section id="section-logged-in" class="hide">
-        <h3>Yay! Logged in :p</h3>
+        <!-- Navbar section -->
+        <nav>
+          <!-- <li class="nav-item" id="nav-register">Register</li>
+          <li class="nav-item" id="nav-login">Login</li> -->
+          <li class="nav-item" id="nav-job-feed">Job Feed</li>
+          <li class="nav-item" id="nav-job-post">Create Job</li>
+        </nav>
 
         <!-- Feed -->
-        <h4>Job Feed</h4>
-        <div id="feed-items">
-          <div id="feed-item" class="feed-item hide">
-            <img
-              class="feed-image"
-              src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg=="
-              alt="Dummy feed image"
-            />
-            <div class="feed-text">
-              <div class="feed-title">FEED TITLE</div>
-              <div class="feed-creator">Dummy McDummy</div>
-              <div class="feed-start">START: 01/01/2024</div>
-              <div class="feed-description">
-                DESCRIPTION: This is a dummy job
+        <div id="page-job-feed">
+          <h4>Job Feed</h4>
+          <div id="feed-items">
+            <div id="feed-item" class="feed-item hide">
+              <img
+                class="feed-image"
+                src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg=="
+                alt="Dummy feed image"
+              />
+              <div class="feed-text">
+                <div class="feed-title">FEED TITLE</div>
+                <div class="feed-creator">Dummy McDummy</div>
+                <div class="feed-start">START: 01/01/2024</div>
+                <div class="feed-description">
+                  DESCRIPTION: This is a dummy job
+                </div>
+                <div class="feed-likes clickable">LIKES: 500</div>
+                <div class="feed-likes-list hide">FEED LIKES LIST</div>
+                <div class="feed-comments clickable">COMMENTS: 2</div>
+                <div class="feed-comments-list hide">FEED COMMENTS LIST</div>
+                <div class="feed-created">01/01/2023</div>
+                <input type="button" class="feed-like-button btn btn-primary" value="Like"/>
+                <!-- <label for="feed-comment">Place your comment here</label> -->
+                <input type="text" class="feed-comment form-control" id="feed-comment" placeholder="Leave a comment here"/>
+                <input type="button" class="feed-comment-button btn btn-primary" value="Post comment"/>
               </div>
-              <div class="feed-likes clickable">LIKES: 500</div>
-              <div class="feed-likes-list hide">FEED LIKES LIST</div>
-              <div class="feed-comments clickable">COMMENTS: 2</div>
-              <div class="feed-comments-list hide">FEED COMMENTS LIST</div>
-              <div class="feed-created">01/01/2023</div>
-              <input type="button" class="feed-like-button btn btn-primary" value="Like"/>
-              <!-- <label for="feed-comment">Place your comment here</label> -->
-              <input type="text" class="feed-comment form-control" id="feed-comment" placeholder="Leave a comment here"/>
-              <input type="button" class="feed-comment-button btn btn-primary" value="Post comment"/>
             </div>
           </div>
         </div>
@@ -173,9 +177,24 @@
         <!-- Update profile page -->
 
         <!-- Adding a job -->
-        <button class="btn btn-primary" id="create-job-fake">
-          Create Fake Job
-        </button>
+        <div id="page-job-post" class="hide">
+          <h4>Post job</h4>
+          <form id="test" method="POST" action="/job">
+            <div class="form-group">
+              <label for="job-post-title">Title</label>
+              <input type="text" class="form-control" id="job-post-title" placeholder="Enter email"/>
+            </div>
+            <div class="form-group">
+              <label for="job-post-image">Image</label>
+              <input type="file" class="form-control" accept="image/*" id="job-post-image" placeholder="Upload image"/>
+            </div>
+            <div class="form-group">
+              <label for="job-post-description">Description</label>
+              <input type="text" class="form-control" id="job-post-description" placeholder="Enter description"/>
+            </div>
+            <input type="button" class="btn btn-primary" id="create-job" value="Create Job">
+          </form>
+        </div>
 
         <!-- Updating & deleting a job -->
 
