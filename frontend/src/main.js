@@ -54,20 +54,13 @@ const createJobElement = (jobDetail, isJob = false) => {
     }
   }
   feedDom.querySelector(".feed-likes-start").innerText = likeStart;
-  feedDom
-    .querySelector(".feed-likes-list")
-    .setAttribute("id", "feed-likes-list_" + jobDetail.id);
   // toggling show and hide feed likes list
   feedDom.querySelector(".feed-likes").addEventListener("click", () => {
-    // toggling show and hide feed likes list
-    if (
-      document
-        .getElementById("feed-likes-list_" + jobDetail.id)
-        .classList.contains("hide")
-    ) {
-      show("feed-likes-list_" + jobDetail.id);
+    console.log("likedList:", likedList);
+    if (likedList.classList.contains("hide")) {
+      likedList.classList.remove("hide");
     } else {
-      hide("feed-likes-list_" + jobDetail.id);
+      likedList.classList.add("hide");
     }
   });
 
@@ -106,56 +99,48 @@ const createJobElement = (jobDetail, isJob = false) => {
   feedDom.querySelector(".feed-comments").innerText =
     "Comments: " + jobDetail.comments.length;
   // get comment list
-  let comments_list = "";
+  const commentsList = feedDom.querySelector(".feed-comments-list");
+  let commentStart = "";
   if (jobDetail.comments.length === 0) {
-    comments_list += "No comments yet";
+    commentStart += "No comments yet";
   } else {
-    for (var i = 0; i < jobDetail.comments.length; i++) {
-      comments_list =
-        comments_list +
-        jobDetail.comments[i].userName +
-        ": " +
-        jobDetail.comments[i].comment +
-        "\n";
+    const commentItem = feedDom.querySelector(".feed-comments-item");
+    // Add the list
+    for (const com of jobDetail.comments) {
+      const dupCom = cloneNode(commentItem);
+      const dupName = dupCom.querySelector(".feed-comments-name");
+      const dupComment = dupCom.querySelector(".feed-comments-comment");
+      dupName.innerText = com.userName;
+      dupComment.innerText = com.comment;
+      dupName.addEventListener("click", () => {
+        showProfile(com.userId);
+      });
+      commentsList.appendChild(dupCom);
     }
-    comments_list = comments_list.substring(0, comments_list.length);
   }
-  feedDom.querySelector(".feed-comments-list").innerText = comments_list;
-  feedDom
-    .querySelector(".feed-comments-list")
-    .setAttribute("id", "feed-comments-list_" + jobDetail.id);
+  feedDom.querySelector(".feed-comments-start").innerText = commentStart;
   // toggling show and hide feed comments list
   feedDom.querySelector(".feed-comments").addEventListener("click", () => {
-    // toggling show and hide feed likes list
-    if (
-      document
-        .getElementById("feed-comments-list_" + jobDetail.id)
-        .classList.contains("hide")
-    ) {
-      show("feed-comments-list_" + jobDetail.id);
+    if (commentsList.classList.contains("hide")) {
+      commentsList.classList.remove("hide");
     } else {
-      hide("feed-comments-list_" + jobDetail.id);
+      commentsList.classList.add("hide");
     }
   });
 
   // post comment
-  feedDom
-    .querySelector(".feed-comment")
-    .setAttribute("id", "feed-comment_" + jobDetail.id);
+  const feedComment = feedDom.querySelector(".feed-comment");
   feedDom
     .querySelector(".feed-comment-button")
     .addEventListener("click", () => {
       // post comment button
-      if (
-        document.getElementById("feed-comment_" + jobDetail.id).value !== ""
-      ) {
+      if (feedComment.value !== "") {
         const payload = {
           id: jobDetail.id,
-          comment: document.getElementById("feed-comment_" + jobDetail.id)
-            .value,
+          comment: feedComment.value,
         };
         apiCall("job/comment", "POST", payload, () => {
-          document.getElementById("feed-comment_" + jobDetail.id).value = "";
+          feedComment.value = "";
         });
         hide("error-popup");
       } else {
@@ -168,6 +153,9 @@ const createJobElement = (jobDetail, isJob = false) => {
   getUserDetails(jobDetail.creatorId)
     .then((creator) => {
       feedDom.querySelector(".feed-creator").innerText = creator.name;
+      feedDom.querySelector(".feed-creator").addEventListener("click", () => {
+        showProfile(jobDetail.creatorId);
+      });
     })
     .catch((error) => {
       console.log("TODO populateFeed getUserDetails ERROR! ", error);
@@ -203,6 +191,8 @@ const populateFeed = () => {
 
 const showProfile = (userId) => {
   // TODO Hide everything else
+  hide("page-job-feed");
+  hide("page-job-post");
 
   // Populate profile-page
   getUserDetails(userId)
@@ -348,8 +338,6 @@ document.getElementById("nav-job-post").addEventListener("click", () => {
 // Navbar Me, show your profile page
 document.getElementById("nav-profile-me").addEventListener("click", () => {
   showProfile(97467); // TODO save logged in userId
-  hide("page-job-feed");
-  hide("page-job-post");
 });
 
 // Register page, login button
