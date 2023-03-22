@@ -7,16 +7,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <!-- You can add your styles and scripts here -->
     <link
-      rel="stylesheet"
-      type="text/css"
-      media="screen"
-      href="styles/global.css"
-    />
-    <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
       rel="stylesheet"
       integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD"
       crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      media="screen"
+      href="styles/global.css"
     />
   </head>
   <body>
@@ -134,11 +134,12 @@
       <!-- Logged in section -->
       <section id="section-logged-in" class="hide">
         <!-- Navbar section -->
-        <nav>
+        <nav class="nav nav-tabs">
           <!-- <li class="nav-item" id="nav-register">Register</li>
           <li class="nav-item" id="nav-login">Login</li> -->
-          <li class="nav-item" id="nav-job-feed">Job Feed</li>
-          <li class="nav-item" id="nav-job-post">Create Job</li>
+          <li class="nav-item nav-link active" id="nav-job-feed">Job Feed</li>
+          <li class="nav-item nav-link" id="nav-job-post">Create Job</li>
+          <li class="nav-item nav-link" id="nav-profile-me">Me</li>
         </nav>
 
         <!-- Feed -->
@@ -163,16 +164,70 @@
                 <div class="feed-comments clickable">COMMENTS: 2</div>
                 <div class="feed-comments-list hide">FEED COMMENTS LIST</div>
                 <div class="feed-created">01/01/2023</div>
-                <input type="button" class="feed-like-button btn btn-primary" value="Like"/>
+                <input
+                  type="button"
+                  class="feed-like-button btn btn-primary"
+                  value="Like"
+                />
                 <!-- <label for="feed-comment">Place your comment here</label> -->
-                <input type="text" class="feed-comment form-control" id="feed-comment" placeholder="Leave a comment here"/>
-                <input type="button" class="feed-comment-button btn btn-primary" value="Post comment"/>
+                <input
+                  type="text"
+                  class="feed-comment form-control"
+                  id="feed-comment"
+                  placeholder="Leave a comment here"
+                />
+                <input
+                  type="button"
+                  class="feed-comment-button btn btn-primary"
+                  value="Post comment"
+                />
               </div>
+              <div class="feed-likes clickable">LIKES: 500</div>
+              <div class="feed-likes-list hide">
+                <span class="feed-likes-start">FEED LIKES LIST</span>
+                <span class="feed-likes-name clickable hide">Bob</span>
+                <span class="feed-likes-sep hide">, </span>
+              </div>
+              <div class="feed-comments clickable">COMMENTS: 2</div>
+              <div class="feed-comments-list hide">FEED COMMENTS LIST</div>
+              <div class="feed-created">01/01/2023</div>
+              <input
+                type="button"
+                class="feed-like-button btn btn-primary"
+                value="Like"
+              />
+              <!-- <label for="feed-comment">Place your comment here</label> -->
+              <input
+                type="text"
+                class="feed-comment form-control"
+                id="feed-comment"
+                placeholder="Leave a comment here"
+              />
+              <input
+                type="button"
+                class="feed-comment-button btn btn-primary"
+                value="Post comment"
+              />
             </div>
           </div>
         </div>
 
         <!-- Profile page -->
+        <div id="profile-page" class="hide">
+          <img
+            id="profile-image"
+            src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg=="
+            alt="Dummy profile image"
+          />
+          <div id="profile-name">Dummy Profile Name</div>
+          <div id="profile-email">Dummy Profile Email</div>
+          <div id="profile-watched-list">
+            <span id="profile-watched-start">Watched by 500 users:</span>
+            <span class="profile-watched-name clickable hide">Tara</span>
+            <span class="profile-watched-sep hide">, </span>
+          </div>
+          <div id="profile-jobs"></div>
+        </div>
 
         <!-- Update profile page -->
 
@@ -182,17 +237,38 @@
           <form id="test" method="POST" action="/job">
             <div class="form-group">
               <label for="job-post-title">Title</label>
-              <input type="text" class="form-control" id="job-post-title" placeholder="Enter email"/>
+              <input
+                type="text"
+                class="form-control"
+                id="job-post-title"
+                placeholder="Enter email"
+              />
             </div>
             <div class="form-group">
               <label for="job-post-image">Image</label>
-              <input type="file" class="form-control" accept="image/*" id="job-post-image" placeholder="Upload image"/>
+              <input
+                type="file"
+                class="form-control"
+                accept="image/*"
+                id="job-post-image"
+                placeholder="Upload image"
+              />
             </div>
             <div class="form-group">
               <label for="job-post-description">Description</label>
-              <input type="text" class="form-control" id="job-post-description" placeholder="Enter description"/>
+              <input
+                type="text"
+                class="form-control"
+                id="job-post-description"
+                placeholder="Enter description"
+              />
             </div>
-            <input type="button" class="btn btn-primary" id="create-job" value="Create Job">
+            <input
+              type="button"
+              class="btn btn-primary"
+              id="create-job"
+              value="Create Job"
+            />
           </form>
         </div>
 

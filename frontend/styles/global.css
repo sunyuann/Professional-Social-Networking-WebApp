@@ -1,6 +1,7 @@
 /* base styles, feel free to edit */
 
-html, body {
+html,
+body {
   margin: 20px;
   padding: 0;
   height: 100%;

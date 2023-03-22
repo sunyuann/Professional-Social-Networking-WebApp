@@ -68,13 +68,12 @@ export const apiCall = (path, method, body, success) => {
   );
 };
 
-// Returns GET /user dictionary response from server
-export const getUserDetails = (userId) => {
-  return new Promise((resolve, reject) => {
-    apiCall("user", "GET", { userId: userId }, (data) => {
-      resolve(data);
-    });
-  });
+// Deep clone and removes id, class "hide"
+export const cloneNode = (element) => {
+  const newElem = element.cloneNode(true);
+  newElem.removeAttribute("id");
+  newElem.classList.remove("hide");
+  return newElem;
 };
 
 // Returns [hours, minutes] where hours and minutes are ints
@@ -86,6 +85,14 @@ export const getHoursMinutesSince = (datetimestr) => {
   return [hours, minutes];
 };
 
+// Returns GET /user dictionary response from server
+export const getUserDetails = (userId) => {
+  return new Promise((resolve, reject) => {
+    apiCall("user", "GET", { userId: userId }, (data) => {
+      resolve(data);
+    });
+  });
+};
 // show error
 export const errorShow = (content) => {
   document.getElementById("error-popup").classList.remove("hide");

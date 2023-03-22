@@ -2,8 +2,9 @@
 import {
   fileToDataUrl,
   apiCall,
-  getUserDetails,
+  cloneNode,
   getHoursMinutesSince,
+  getUserDetails,
   errorShow,
 } from "./helpers.js";
 
@@ -26,10 +27,7 @@ const populateFeed = () => {
       return new Date(b.createdAt) - new Date(a.createdAt);
     });
     for (const feedItem of data) {
-      const feedDom = baseFeedItem.cloneNode(true);
-      // Remove ID and hide class
-      feedDom.removeAttribute("id");
-      feedDom.classList.remove("hide");
+      const feedDom = cloneNode(baseFeedItem);
       // Update fields
       feedDom.querySelector(".feed-image").innerText = feedItem.image;
       feedDom.querySelector(".feed-title").innerText = feedItem.title;
@@ -39,23 +37,40 @@ const populateFeed = () => {
       feedDom.querySelector(".feed-likes").innerText =
         "Likes: " + feedItem.likes.length;
       // get liked list
-      let likes_list = "";
+      const likedList = feedDom.querySelector(".feed-likes-list");
+      let likeStart = "";
       if (feedItem.likes.length === 0) {
-        likes_list += "Liked by no one";
-      }
-      else {
-        likes_list += "Liked by ";
-        for (var i = 0; i < feedItem.likes.length; i++) {
-          likes_list = likes_list + feedItem.likes[i].userName + ", ";
+        likeStart += "Liked by no one";
+      } else {
+        likeStart += "Liked by ";
+        const likeName = feedDom.querySelector(".feed-likes-name");
+        const likeSep = feedDom.querySelector(".feed-likes-sep");
+        // Add the list
+        for (let i = 0; i < feedItem.likes.length; i++) {
+          if (i > 0) {
+            const dupSep = cloneNode(likeSep);
+            likedList.appendChild(dupSep);
+          }
+          const dupName = cloneNode(likeName);
+          dupName.innerText = feedItem.likes[i].userName;
+          dupName.addEventListener("click", () => {
+            showProfile(feedItem.likes[i].userId);
+          });
+          likedList.appendChild(dupName);
         }
-        likes_list = likes_list.substring(0, likes_list.length-2)
       }
-      feedDom.querySelector(".feed-likes-list").innerText = likes_list;
-      feedDom.querySelector(".feed-likes-list").setAttribute('id', 'feed-likes-list_' + feedItem.id);
+      feedDom.querySelector(".feed-likes-start").innerText = likeStart;
+      feedDom
+        .querySelector(".feed-likes-list")
+        .setAttribute("id", "feed-likes-list_" + feedItem.id);
       // toggling show and hide feed likes list
       feedDom.querySelector(".feed-likes").addEventListener("click", () => {
         // toggling show and hide feed likes list
-        if (document.getElementById("feed-likes-list_" + feedItem.id).classList.contains("hide")) {
+        if (
+          document
+            .getElementById("feed-likes-list_" + feedItem.id)
+            .classList.contains("hide")
+        ) {
           show("feed-likes-list_" + feedItem.id);
         } else {
           hide("feed-likes-list_" + feedItem.id);
@@ -76,42 +91,55 @@ const populateFeed = () => {
       }
       likeButtonTurnOn = !likeButtonTurnOn;
       // like button
-      feedDom.querySelector(".feed-like-button").setAttribute('id', 'feed-like-button_' + feedItem.id);
-      feedDom.querySelector(".feed-like-button").addEventListener('click', () => {
-        // like/dislike button
-        const payload = {
-          id: feedItem.id,
-          turnon: !likeButtonTurnOn,
-        };
-        apiCall("job/like", "PUT", payload, () => {
+      feedDom
+        .querySelector(".feed-like-button")
+        .setAttribute("id", "feed-like-button_" + feedItem.id);
+      feedDom
+        .querySelector(".feed-like-button")
+        .addEventListener("click", () => {
+          // like/dislike button
+          const payload = {
+            id: feedItem.id,
+            turnon: !likeButtonTurnOn,
+          };
+          apiCall("job/like", "PUT", payload, () => {});
+          if (likeButtonTurnOn) {
+            feedDom.querySelector(".feed-like-button").value = "Like";
+          } else {
+            feedDom.querySelector(".feed-like-button").value = "Unlike";
+          }
+          likeButtonTurnOn = !likeButtonTurnOn;
         });
-        if (likeButtonTurnOn) {
-          feedDom.querySelector(".feed-like-button").value = "Like";
-        } else {
-          feedDom.querySelector(".feed-like-button").value = "Unlike";
-        }
-        likeButtonTurnOn = !likeButtonTurnOn;
-      });
 
       feedDom.querySelector(".feed-comments").innerText =
         "Comments: " + feedItem.comments.length;
       // get comment list
       let comments_list = "";
       if (feedItem.comments.length === 0) {
-        comments_list += "No comments yet"
-      }
-      else {
+        comments_list += "No comments yet";
+      } else {
         for (var i = 0; i < feedItem.comments.length; i++) {
-          comments_list = comments_list + feedItem.comments[i].userName + ": " + feedItem.comments[i].comment + "\n";
+          comments_list =
+            comments_list +
+            feedItem.comments[i].userName +
+            ": " +
+            feedItem.comments[i].comment +
+            "\n";
         }
-        comments_list = comments_list.substring(0, comments_list.length)
+        comments_list = comments_list.substring(0, comments_list.length);
       }
       feedDom.querySelector(".feed-comments-list").innerText = comments_list;
-      feedDom.querySelector(".feed-comments-list").setAttribute('id', 'feed-comments-list_' + feedItem.id);
+      feedDom
+        .querySelector(".feed-comments-list")
+        .setAttribute("id", "feed-comments-list_" + feedItem.id);
       // toggling show and hide feed comments list
       feedDom.querySelector(".feed-comments").addEventListener("click", () => {
         // toggling show and hide feed likes list
-        if (document.getElementById("feed-comments-list_" + feedItem.id).classList.contains("hide")) {
+        if (
+          document
+            .getElementById("feed-comments-list_" + feedItem.id)
+            .classList.contains("hide")
+        ) {
           show("feed-comments-list_" + feedItem.id);
         } else {
           hide("feed-comments-list_" + feedItem.id);
@@ -119,24 +147,30 @@ const populateFeed = () => {
       });
 
       // post comment
-      feedDom.querySelector(".feed-comment").setAttribute('id', 'feed-comment_' + feedItem.id);
-      feedDom.querySelector(".feed-comment-button").addEventListener('click', () => {
-        // post comment button
-        if (document.getElementById('feed-comment_' + feedItem.id).value !== "") {
-          const payload = {
-            id: feedItem.id,
-            comment: document.getElementById('feed-comment_' + feedItem.id).value,
-          };
-          apiCall("job/comment", "POST", payload, () => {
-            document.getElementById('feed-comment_' + feedItem.id).value = "";
-          });
-          hide('error-popup');
-        } else {
-          // case if comment box empty
-          errorShow("Comment can't be empty, please try again.")
-        }
-      });
-      
+      feedDom
+        .querySelector(".feed-comment")
+        .setAttribute("id", "feed-comment_" + feedItem.id);
+      feedDom
+        .querySelector(".feed-comment-button")
+        .addEventListener("click", () => {
+          // post comment button
+          if (
+            document.getElementById("feed-comment_" + feedItem.id).value !== ""
+          ) {
+            const payload = {
+              id: feedItem.id,
+              comment: document.getElementById("feed-comment_" + feedItem.id)
+                .value,
+            };
+            apiCall("job/comment", "POST", payload, () => {
+              document.getElementById("feed-comment_" + feedItem.id).value = "";
+            });
+            hide("error-popup");
+          } else {
+            // case if comment box empty
+            errorShow("Comment can't be empty, please try again.");
+          }
+        });
 
       // Fetch creator name and update
       getUserDetails(feedItem.creatorId)
@@ -160,6 +194,52 @@ const populateFeed = () => {
   });
 };
 
+const showProfile = (userId) => {
+  // TODO Hide everything else
+
+  // Populate profile-page
+  getUserDetails(userId)
+    .then((user) => {
+      const pp = document.getElementById("profile-page");
+      pp.querySelector("#profile-email").innerText = user.email;
+      pp.querySelector("#profile-name").innerText = user.name;
+      pp.querySelector("#profile-image").innerText = user.image;
+      let watchString = `Watched by ${user.watcheeUserIds.length} users`;
+      const numWatchers = user.watcheeUserIds.length;
+      watchString += `${numWatchers > 0 ? ":" : "."}`;
+      pp.querySelector("#profile-watched-start").innerText = watchString;
+      const watchList = pp.querySelector("#profile-watched-list");
+      const watchName = pp.querySelector(".profile-watched-name");
+      const watchSep = pp.querySelector(".profile-watched-sep");
+      for (let i = 0; i < numWatchers; i++) {
+        const watcheeId = user.watcheeUserIds[i];
+        if (i > 0) {
+          const dupSep = cloneNode(watchSep);
+          watchList.appendChild(dupSep);
+        }
+        const dupName = cloneNode(watchName);
+        getUserDetails(watcheeId)
+          .then((watchee) => {
+            dupName.innerText = watchee.name;
+          })
+          .catch((error) => {
+            console.log(
+              `TODO showProfile getUserDetails forloop ${watcheeId} ERROR!`,
+              error
+            );
+          });
+        dupName.addEventListener("click", () => {
+          showProfile(watcheeId);
+        });
+        watchList.appendChild(dupName);
+      }
+    })
+    .catch((error) => {
+      console.log("TODO showProfile getUserDetails ERROR! ", error);
+    });
+  show("profile-page");
+};
+
 const setToken = (token) => {
   localStorage.setItem("token", token);
   show("section-logged-in");
@@ -181,7 +261,7 @@ document.getElementById("login-login").addEventListener("click", () => {
   };
   apiCall("auth/login", "POST", payload, (data) => {
     setToken(data.token);
-    hide('error-popup');
+    hide("error-popup");
   });
 });
 
@@ -232,18 +312,24 @@ document.getElementById("error-close").addEventListener("click", () => {
 //   hide("page-login");
 // });
 
-// Navbar register, show job feed page
+// Navbar Job Feed, show job feed page
 document.getElementById("nav-job-feed").addEventListener("click", () => {
   show("page-job-feed");
   hide("page-job-post");
 });
 
-// Navbar register, show job post page
+// Navbar Create Job, show job post page
 document.getElementById("nav-job-post").addEventListener("click", () => {
   show("page-job-post");
   hide("page-job-feed");
 });
 
+// Navbar Me, show your profile page
+document.getElementById("nav-profile-me").addEventListener("click", () => {
+  showProfile(97467); // TODO save logged in userId
+  hide("page-job-feed");
+  hide("page-job-post");
+});
 
 // Register page, login button
 document.getElementById("register-login").addEventListener("click", () => {
@@ -280,7 +366,7 @@ document.getElementById("create-job").addEventListener("click", () => {
   if (title === "") {
     errorShow("Please enter a title");
     return;
-  } else if (document.querySelector('#job-post-image').files.length === 0) {
+  } else if (document.querySelector("#job-post-image").files.length === 0) {
     errorShow("Please upload an image");
     return;
   } else if (description === "") {
@@ -288,7 +374,7 @@ document.getElementById("create-job").addEventListener("click", () => {
     return;
   }
   // convert to base64, then create job
-  const image_file = document.querySelector('#job-post-image').files[0];
+  const image_file = document.querySelector("#job-post-image").files[0];
   fileToDataUrl(image_file)
     .then((image) => {
       const payload = {
@@ -298,17 +384,16 @@ document.getElementById("create-job").addEventListener("click", () => {
         description: description,
       };
       apiCall("job", "POST", payload, () => {
-        document.getElementById('job-post-title').value = "";
+        document.getElementById("job-post-title").value = "";
         document.getElementById("job-post-description").value = "";
-        document.getElementById('job-post-image').value = "";
+        document.getElementById("job-post-image").value = "";
       });
-      hide('error-popup');
+      hide("error-popup");
     })
     .catch((error) => {
       console.log("Image not found", error);
     });
 });
-
 
 ////////////////
 // Main logic //
