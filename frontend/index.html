@@ -7,16 +7,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <!-- You can add your styles and scripts here -->
     <link
-      rel="stylesheet"
-      type="text/css"
-      media="screen"
-      href="styles/global.css"
-    />
-    <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
       rel="stylesheet"
       integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD"
       crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      media="screen"
+      href="styles/global.css"
     />
   </head>
   <body>
@@ -26,6 +26,7 @@
       <nav class="hide">
         <li class="nav-item" id="nav-register">Register</li>
         <li class="nav-item" id="nav-login">Login</li>
+        <li class="nav-item" id="nav-me">Me</li>
       </nav>
     </header>
     <main role="main">
@@ -156,7 +157,11 @@
                 DESCRIPTION: This is a dummy job
               </div>
               <div class="feed-likes clickable">LIKES: 500</div>
-              <div class="feed-likes-list hide">FEED LIKES LIST</div>
+              <div class="feed-likes-list hide">
+                <span class="feed-likes-start">FEED LIKES LIST</span>
+                <span class="feed-likes-name clickable hide">Bob</span>
+                <span class="feed-likes-sep hide">, </span>
+              </div>
               <div class="feed-comments clickable">COMMENTS: 2</div>
               <div class="feed-comments-list hide">FEED COMMENTS LIST</div>
               <div class="feed-created">01/01/2023</div>
@@ -182,6 +187,21 @@
         </div>
 
         <!-- Profile page -->
+        <div id="profile-page" class="hide">
+          <img
+            id="profile-image"
+            src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg=="
+            alt="Dummy profile image"
+          />
+          <div id="profile-name">Dummy Profile Name</div>
+          <div id="profile-email">Dummy Profile Email</div>
+          <div id="profile-watched-list">
+            <span id="profile-watched-start">Watched by 500 users:</span>
+            <span class="profile-watched-name clickable hide">Tara</span>
+            <span class="profile-watched-sep hide">, </span>
+          </div>
+          <div id="profile-jobs"></div>
+        </div>
 
         <!-- Update profile page -->
 

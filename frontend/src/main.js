@@ -2,8 +2,9 @@
 import {
   fileToDataUrl,
   apiCall,
-  getUserDetails,
+  cloneNode,
   getHoursMinutesSince,
+  getUserDetails,
 } from "./helpers.js";
 
 ///////////////
@@ -33,10 +34,7 @@ const populateFeed = () => {
       return new Date(b.createdAt) - new Date(a.createdAt);
     });
     for (const feedItem of data) {
-      const feedDom = baseFeedItem.cloneNode(true);
-      // Remove ID and hide class
-      feedDom.removeAttribute("id");
-      feedDom.classList.remove("hide");
+      const feedDom = cloneNode(baseFeedItem);
       // Update fields
       feedDom.querySelector(".feed-image").innerText = feedItem.image;
       feedDom.querySelector(".feed-title").innerText = feedItem.title;
@@ -46,17 +44,29 @@ const populateFeed = () => {
       feedDom.querySelector(".feed-likes").innerText =
         "Likes: " + feedItem.likes.length;
       // get liked list
-      let likes_list = "";
+      const likedList = feedDom.querySelector(".feed-likes-list");
+      let likeStart = "";
       if (feedItem.likes.length === 0) {
-        likes_list += "Liked by no one";
+        likeStart += "Liked by no one";
       } else {
-        likes_list += "Liked by ";
-        for (var i = 0; i < feedItem.likes.length; i++) {
-          likes_list = likes_list + feedItem.likes[i].userName + ", ";
+        likeStart += "Liked by ";
+        const likeName = feedDom.querySelector(".feed-likes-name");
+        const likeSep = feedDom.querySelector(".feed-likes-sep");
+        // Add the list
+        for (let i = 0; i < feedItem.likes.length; i++) {
+          if (i > 0) {
+            const dupSep = cloneNode(likeSep);
+            likedList.appendChild(dupSep);
+          }
+          const dupName = cloneNode(likeName);
+          dupName.innerText = feedItem.likes[i].userName;
+          dupName.addEventListener("click", () => {
+            showProfile(feedItem.likes[i].userId);
+          });
+          likedList.appendChild(dupName);
         }
-        likes_list = likes_list.substring(0, likes_list.length - 2);
       }
-      feedDom.querySelector(".feed-likes-list").innerText = likes_list;
+      feedDom.querySelector(".feed-likes-start").innerText = likeStart;
       feedDom
         .querySelector(".feed-likes-list")
         .setAttribute("id", "feed-likes-list_" + feedItem.id);
@@ -189,6 +199,52 @@ const populateFeed = () => {
     }
     console.log("data", data);
   });
+};
+
+const showProfile = (userId) => {
+  // TODO Hide everything else
+
+  // Populate profile-page
+  getUserDetails(userId)
+    .then((user) => {
+      const pp = document.getElementById("profile-page");
+      pp.querySelector("#profile-email").innerText = user.email;
+      pp.querySelector("#profile-name").innerText = user.name;
+      pp.querySelector("#profile-image").innerText = user.image;
+      let watchString = `Watched by ${user.watcheeUserIds.length} users`;
+      const numWatchers = user.watcheeUserIds.length;
+      watchString += `${numWatchers > 0 ? ":" : "."}`;
+      pp.querySelector("#profile-watched-start").innerText = watchString;
+      const watchList = pp.querySelector("#profile-watched-list");
+      const watchName = pp.querySelector(".profile-watched-name");
+      const watchSep = pp.querySelector(".profile-watched-sep");
+      for (let i = 0; i < numWatchers; i++) {
+        const watcheeId = user.watcheeUserIds[i];
+        if (i > 0) {
+          const dupSep = cloneNode(watchSep);
+          watchList.appendChild(dupSep);
+        }
+        const dupName = cloneNode(watchName);
+        getUserDetails(watcheeId)
+          .then((watchee) => {
+            dupName.innerText = watchee.name;
+          })
+          .catch((error) => {
+            console.log(
+              `TODO showProfile getUserDetails forloop ${watcheeId} ERROR!`,
+              error
+            );
+          });
+        dupName.addEventListener("click", () => {
+          showProfile(watcheeId);
+        });
+        watchList.appendChild(dupName);
+      }
+    })
+    .catch((error) => {
+      console.log("TODO showProfile getUserDetails ERROR! ", error);
+    });
+  show("profile-page");
 };
 
 const setToken = (token) => {
