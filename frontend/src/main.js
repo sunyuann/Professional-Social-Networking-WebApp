@@ -99,28 +99,32 @@ const createJobElement = (jobDetail, isJob = false) => {
   feedDom.querySelector(".feed-comments").innerText =
     "Comments: " + jobDetail.comments.length;
   // get comment list
-  let comments_list = "";
+  const commentsList = feedDom.querySelector(".feed-comments-list");
+  let commentStart = "";
   if (jobDetail.comments.length === 0) {
-    comments_list += "No comments yet";
+    commentStart += "No comments yet";
   } else {
-    for (var i = 0; i < jobDetail.comments.length; i++) {
-      comments_list =
-        comments_list +
-        jobDetail.comments[i].userName +
-        ": " +
-        jobDetail.comments[i].comment +
-        "\n";
+    const commentItem = feedDom.querySelector(".feed-comments-item");
+    // Add the list
+    for (const com of jobDetail.comments) {
+      const dupCom = cloneNode(commentItem);
+      const dupName = dupCom.querySelector(".feed-comments-name");
+      const dupComment = dupCom.querySelector(".feed-comments-comment");
+      dupName.innerText = com.userName;
+      dupComment.innerText = com.comment;
+      dupName.addEventListener("click", () => {
+        showProfile(com.userId);
+      });
+      commentsList.appendChild(dupCom);
     }
-    comments_list = comments_list.substring(0, comments_list.length);
   }
-  const commentsListDom = feedDom.querySelector(".feed-comments-list");
-  commentsListDom.innerText = comments_list;
+  feedDom.querySelector(".feed-comments-start").innerText = commentStart;
   // toggling show and hide feed comments list
   feedDom.querySelector(".feed-comments").addEventListener("click", () => {
-    if (commentsListDom.classList.contains("hide")) {
-      commentsListDom.classList.remove("hide");
+    if (commentsList.classList.contains("hide")) {
+      commentsList.classList.remove("hide");
     } else {
-      commentsListDom.classList.add("hide");
+      commentsList.classList.add("hide");
     }
   });
 
@@ -184,6 +188,8 @@ const populateFeed = () => {
 
 const showProfile = (userId) => {
   // TODO Hide everything else
+  hide("page-job-feed");
+  hide("page-job-post");
 
   // Populate profile-page
   getUserDetails(userId)
@@ -329,8 +335,6 @@ document.getElementById("nav-job-post").addEventListener("click", () => {
 // Navbar Me, show your profile page
 document.getElementById("nav-profile-me").addEventListener("click", () => {
   showProfile(97467); // TODO save logged in userId
-  hide("page-job-feed");
-  hide("page-job-post");
 });
 
 // Register page, login button
