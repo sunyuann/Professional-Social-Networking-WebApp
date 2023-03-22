@@ -570,6 +570,14 @@ document.getElementById("update-profile").addEventListener("click", () => {
     });
 });
 
+// Update profile cancel
+document
+  .getElementById("update-profile-cancel")
+  .addEventListener("click", () => {
+    hideAll();
+    showProfile(localStorage.getItem("userId"));
+  });
+
 ////////////////
 // Main logic //
 ////////////////
