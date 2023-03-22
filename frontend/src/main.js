@@ -24,7 +24,7 @@ const createJobElement = (jobDetail, isJob = false) => {
   const baseFeedItem = document.getElementById("feed-item");
   const feedDom = cloneNode(baseFeedItem);
   // Update fields
-  feedDom.querySelector(".feed-image").innerText = jobDetail.image;
+  feedDom.querySelector(".feed-image").src = jobDetail.image;
   feedDom.querySelector(".feed-title").innerText = jobDetail.title;
   feedDom.querySelector(".feed-start").innerText = jobDetail.start;
   feedDom.querySelector(".feed-description").innerText = jobDetail.description;
@@ -66,7 +66,8 @@ const createJobElement = (jobDetail, isJob = false) => {
   let likeButtonTurnOn = true;
   // console.log(jobDetail.likes[0].userId);
   for (var i = 0; i < jobDetail.likes.length; i++) {
-    if (jobDetail.likes[0].userId === 65687) {
+    // TODO: replace 65687 with user's actual id
+    if (jobDetail.likes[i].userId === 65687) {
       likeButtonTurnOn = false;
     }
   }
@@ -169,6 +170,81 @@ const createJobElement = (jobDetail, isJob = false) => {
 
   if (isJob) {
     feedDom.querySelector(".jobs-update-delete").classList.remove("hide");
+    // edit button show form
+    feedDom.querySelector(".job-edit-button").addEventListener("click", () => {
+      // edit button
+      if (feedDom.querySelector(".job-edit-button").value === "Edit") {
+        feedDom.querySelector(".job-edit-button").value = "Cancel";
+        feedDom.querySelector("#page-job-post-update").classList.remove("hide");
+      } else {
+        feedDom.querySelector(".job-edit-button").value = "Edit";
+        feedDom.querySelector("#page-job-post-update").classList.add("hide");
+      }
+    });
+
+    // update job button
+    feedDom
+      .querySelector(".update-job-button")
+      .addEventListener("click", () => {
+        const title = feedDom.querySelector("#job-post-update-title").value;
+        const description = feedDom.querySelector(
+          "#job-post-update-description"
+        ).value;
+        const start = feedDom.querySelector("#job-post-update-start").value;
+        // error checking
+        if (title === "") {
+          errorShow("Please enter a title");
+          return;
+        } else if (
+          feedDom.querySelector("#job-post-update-image").files.length === 0
+        ) {
+          errorShow("Please upload an image");
+          return;
+        } else if (start === "") {
+          errorShow("Please select a date");
+        } else if (description === "") {
+          errorShow("Please enter a description");
+          return;
+        }
+        // convert to base64, then create job
+        const image_file = feedDom.querySelector("#job-post-update-image")
+          .files[0];
+        fileToDataUrl(image_file)
+          .then((image) => {
+            console.log(image);
+            const payload = {
+              id: jobDetail.id,
+              title: title,
+              image: image,
+              start: new Date(start).toISOString(),
+              description: description,
+            };
+            apiCall("job", "PUT", payload, () => {
+              feedDom.querySelector("#job-post-update-title").value = "";
+              feedDom.querySelector("#job-post-update-image").value = "";
+              feedDom.querySelector("#job-post-update-start").value = "";
+              feedDom.querySelector("#job-post-update-description").value = "";
+            });
+            hide("error-popup");
+          })
+          .catch((error) => {
+            console.log("Image not found", error);
+          });
+      });
+
+    // delete job button
+    feedDom
+      .querySelector(".job-delete-button")
+      .addEventListener("click", () => {
+        const payload = {
+          id: jobDetail.id,
+        };
+        apiCall("job", "DELETE", payload, () => {
+          feedDom.classList.add("hide");
+          console.log("SUCCESS");
+          hide("error-popup");
+        });
+      });
   }
   return feedDom;
 };
@@ -403,6 +479,7 @@ document.getElementById("logout").addEventListener("click", () => {
 document.getElementById("create-job").addEventListener("click", () => {
   const title = document.getElementById("job-post-title").value;
   const description = document.getElementById("job-post-description").value;
+  const start = document.getElementById("job-post-start").value;
   // error checking
   if (title === "") {
     errorShow("Please enter a title");
@@ -410,10 +487,13 @@ document.getElementById("create-job").addEventListener("click", () => {
   } else if (document.querySelector("#job-post-image").files.length === 0) {
     errorShow("Please upload an image");
     return;
+  } else if (start === "") {
+    errorShow("Please select a date");
   } else if (description === "") {
     errorShow("Please enter a description");
     return;
   }
+
   // convert to base64, then create job
   const image_file = document.querySelector("#job-post-image").files[0];
   fileToDataUrl(image_file)
@@ -421,13 +501,14 @@ document.getElementById("create-job").addEventListener("click", () => {
       const payload = {
         title: title,
         image: image,
-        start: new Date().toISOString(),
+        start: new Date(start).toISOString(),
         description: description,
       };
       apiCall("job", "POST", payload, () => {
         document.getElementById("job-post-title").value = "";
-        document.getElementById("job-post-description").value = "";
         document.getElementById("job-post-image").value = "";
+        document.getElementById("job-post-start").value = "";
+        document.getElementById("job-post-description").value = "";
       });
       hide("error-popup");
     })
