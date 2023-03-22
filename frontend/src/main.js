@@ -210,7 +210,9 @@ document.getElementById("login-login").addEventListener("click", () => {
     email: document.getElementById("login-email").value,
     password: document.getElementById("login-password").value,
   };
-  apiCall("auth/login", "POST", payload, () => {});
+  apiCall("auth/login", "POST", payload, (data) => {
+    setToken(data.token);
+  });
 });
 
 // Login page, toggle show/hide passwords (optional??)
