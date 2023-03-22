@@ -153,6 +153,9 @@ const createJobElement = (jobDetail, isJob = false) => {
   getUserDetails(jobDetail.creatorId)
     .then((creator) => {
       feedDom.querySelector(".feed-creator").innerText = creator.name;
+      feedDom.querySelector(".feed-creator").addEventListener("click", () => {
+        showProfile(jobDetail.creatorId);
+      });
     })
     .catch((error) => {
       console.log("TODO populateFeed getUserDetails ERROR! ", error);
