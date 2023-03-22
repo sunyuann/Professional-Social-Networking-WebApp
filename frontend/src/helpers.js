@@ -49,9 +49,6 @@ export const apiCall = (path, method, body, success) => {
     }
     path = path.substring(0, path.length - 1);
   } else {
-    if (method == "PUT") {
-      console.log("BODY:", body);
-    }
     options.body = JSON.stringify(body);
   }
   if (localStorage.getItem("token")) {
