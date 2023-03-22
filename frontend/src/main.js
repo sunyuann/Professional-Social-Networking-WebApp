@@ -189,14 +189,17 @@ const populateFeed = () => {
 };
 
 const showProfile = (userId) => {
-  // TODO Hide everything else
-  hide("page-job-feed");
-  hide("page-job-post");
-
-  // Populate profile-page
+  hideAll();
+  const btn = document.getElementById("profile-edit");
+  if (userId === localStorage.getItem("userId")) {
+    btn.classList.remove("hide");
+  } else {
+    btn.classList.add("hide");
+  }
+  // Populate page-profile
   getUserDetails(userId)
     .then((user) => {
-      const pp = document.getElementById("profile-page");
+      const pp = document.getElementById("page-profile");
       pp.querySelector("#profile-userid").innerText = user.id;
       pp.querySelector("#profile-email").innerText = user.email;
       pp.querySelector("#profile-name").innerText = user.name;
@@ -252,7 +255,28 @@ const showProfile = (userId) => {
     .catch((error) => {
       console.log("TODO showProfile getUserDetails ERROR! ", error);
     });
-  show("profile-page");
+  show("page-profile");
+};
+
+const updateProfile = () => {
+  getUserDetails(localStorage.getItem("userId"))
+    .then((user) => {
+      const pu = document.getElementById("page-profile-update");
+      pu.querySelector("#update-email").value = user.email;
+      pu.querySelector("#update-name").value = user.name;
+    })
+    .catch((error) => {
+      console.log("TODO showProfile getUserDetails ERROR! ", error);
+    });
+};
+
+// Hides all pages
+const hideAll = () => {
+  hide("page-job-feed");
+  hide("page-job-post");
+  hide("page-profile");
+  hide("page-profile-update");
+  hide("error-popup");
 };
 
 // Save token and userId
@@ -263,6 +287,7 @@ const setToken = (token, userId) => {
   hide("section-logged-out");
   hide("error-popup");
   populateFeed();
+  updateProfile();
 };
 
 ////////////////////////////////
@@ -329,16 +354,22 @@ document.getElementById("error-close").addEventListener("click", () => {
 //   hide("page-login");
 // });
 
+// Navbar login, show login page
+// document.getElementById("nav-login").addEventListener("click", () => {
+//   show("page-login");
+//   hide("page-register");
+// });
+
 // Navbar Job Feed, show job feed page
 document.getElementById("nav-job-feed").addEventListener("click", () => {
+  hideAll();
   show("page-job-feed");
-  hide("page-job-post");
 });
 
 // Navbar Create Job, show job post page
 document.getElementById("nav-job-post").addEventListener("click", () => {
+  hideAll();
   show("page-job-post");
-  hide("page-job-feed");
 });
 
 // Navbar Me, show your profile page
@@ -360,13 +391,7 @@ document.getElementById("login-register").addEventListener("click", () => {
   hide("page-login");
 });
 
-// // Login register, show login page
-// document.getElementById("nav-login").addEventListener("click", () => {
-//   show("page-login");
-//   hide("page-register");
-// });
-
-// if token does not exist, display logged out section
+// logout button
 document.getElementById("logout").addEventListener("click", () => {
   show("section-logged-out");
   hide("section-logged-in");
@@ -411,6 +436,59 @@ document.getElementById("create-job").addEventListener("click", () => {
     });
 });
 
+// Page update profile
+document.getElementById("profile-edit").addEventListener("click", () => {
+  if (localStorage.getItem("userId")) {
+    hideAll();
+    show("page-profile-update");
+  } else {
+    errorShow("You're not logged in");
+  }
+});
+
+// Update profile
+document.getElementById("update-profile").addEventListener("click", () => {
+  const passwordDom = document.getElementById("update-password");
+  const imageDom = document.getElementById("update-image");
+  const payload = {};
+  if (passwordDom.value.length > 0) {
+    payload.password = passwordDom.value;
+  }
+  getUserDetails(localStorage.getItem("userId"))
+    .then((user) => {
+      const updateEmail = document.getElementById("update-email");
+      const updateName = document.getElementById("update-name");
+      if (updateEmail.value !== user.email) {
+        payload.email = updateEmail.value;
+      }
+      if (updateName.value !== user.name) {
+        payload.name = updateName.value;
+      }
+      const upload = (payload) => {
+        apiCall("user", "PUT", payload, () => {
+          hideAll();
+          showProfile(localStorage.getItem("userId"));
+        });
+      };
+      if (imageDom.files.length > 0) {
+        fileToDataUrl(imageDom.files[0])
+          .then((image) => {
+            payload.image = image;
+            upload(payload);
+          })
+          .catch((error) => {
+            errorShow("Provided profile image is not a png, jpg or jpeg.");
+            imageError = true;
+          });
+      } else {
+        upload(payload);
+      }
+    })
+    .catch((error) => {
+      console.log("TODO getUserDetails update profile ERROR! ", error);
+    });
+});
+
 ////////////////
 // Main logic //
 ////////////////
@@ -419,6 +497,7 @@ if (localStorage.getItem("token") && localStorage.getItem("userId")) {
   hide("section-logged-out");
   hide("error-popup");
   populateFeed();
+  updateProfile();
   console.log(localStorage.getItem("token"));
 }
 const curr_date = new Date();

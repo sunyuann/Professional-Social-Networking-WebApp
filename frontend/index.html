@@ -208,7 +208,7 @@
         </div>
 
         <!-- Profile page -->
-        <div id="profile-page" class="hide">
+        <div id="page-profile" class="hide">
           <img
             id="profile-image"
             src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg=="
@@ -217,6 +217,12 @@
           <div id="profile-name">Dummy Profile Name</div>
           <div id="profile-userid">4561</div>
           <div id="profile-email">Dummy Profile Email</div>
+          <input
+            type="button"
+            id="profile-edit"
+            class="hide"
+            value="Edit your profile"
+          />
           <div id="profile-watched-list">
             <span id="profile-watched-start">Watched by 500 users:</span>
             <span class="profile-watched-name clickable hide">Tara</span>
@@ -226,6 +232,52 @@
         </div>
 
         <!-- Update profile page -->
+        <div id="page-profile-update" class="hide">
+          <h4>Update your profile</h4>
+          <div class="form-group">
+            <label for="update-email">Email</label>
+            <input
+              type="text"
+              id="update-email"
+              class="form-control"
+              value="dummy@email.com"
+            />
+          </div>
+          <div class="form-group">
+            <label for="update-password">Password</label>
+            <input
+              type="text"
+              id="update-password"
+              class="form-control"
+              value=""
+              placeholder="no change"
+            />
+          </div>
+          <div class="form-group">
+            <label for="update-name">Name</label>
+            <input
+              type="text"
+              id="update-name"
+              class="form-control"
+              value="Luke"
+            />
+          </div>
+          <div class="form-group">
+            <label for="update-image">Image</label>
+            <input
+              type="file"
+              accept="image/*"
+              class="form-control"
+              id="update-image"
+            />
+          </div>
+          <input
+            type="button"
+            class="btn btn-primary"
+            id="update-profile"
+            value="Update profile"
+          />
+        </div>
 
         <!-- Adding a job -->
         <div id="page-job-post" class="hide">

@@ -20,7 +20,9 @@ export function fileToDataUrl(file) {
   const valid = validFileTypes.find((type) => type === file.type);
   // Bad data, let's walk away.
   if (!valid) {
-    throw Error("provided file is not a png, jpg or jpeg image.");
+    return Promise.reject(
+      new Error("provided file is not a png, jpg or jpeg image.")
+    );
   }
 
   const reader = new FileReader();
@@ -47,6 +49,9 @@ export const apiCall = (path, method, body, success) => {
     }
     path = path.substring(0, path.length - 1);
   } else {
+    if (method == "PUT") {
+      console.log("BODY:", body);
+    }
     options.body = JSON.stringify(body);
   }
   if (localStorage.getItem("token")) {
