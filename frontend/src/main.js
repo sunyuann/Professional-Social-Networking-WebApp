@@ -24,7 +24,7 @@ const createJobElement = (jobDetail, isJob = false) => {
   const baseFeedItem = document.getElementById("feed-item");
   const feedDom = cloneNode(baseFeedItem);
   // Update fields
-  feedDom.querySelector(".feed-image").innerText = jobDetail.image;
+  feedDom.querySelector(".feed-image").src = jobDetail.image;
   feedDom.querySelector(".feed-title").innerText = jobDetail.title;
   feedDom.querySelector(".feed-start").innerText = jobDetail.start;
   feedDom.querySelector(".feed-description").innerText = jobDetail.description;
@@ -182,6 +182,8 @@ const createJobElement = (jobDetail, isJob = false) => {
         feedDom.querySelector("#page-job-post-update").classList.add("hide");
       }
     });
+
+    // update job button
     feedDom.querySelector(".update-job-button").addEventListener("click", () => {
       const title = feedDom.querySelector("#job-post-update-title").value;
       const description = feedDom.querySelector("#job-post-update-description").value;
@@ -222,6 +224,18 @@ const createJobElement = (jobDetail, isJob = false) => {
         .catch((error) => {
           console.log("Image not found", error);
         });
+    });
+
+    // delete job button
+    feedDom.querySelector(".job-delete-button").addEventListener("click", () => {
+      const payload = {
+        id: jobDetail.id,
+      };
+      apiCall("job", "DELETE", payload, () => {
+        feedDom.classList.add("hide");
+        console.log("SUCCESS");
+        hide("error-popup");
+      });
     });
   }
   return feedDom;
