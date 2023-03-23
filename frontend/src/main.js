@@ -258,24 +258,30 @@ const createJobElement = (jobDetail, editable = false) => {
 
 // Live updates
 const liveUpdate = (start, nodes) => {
-  setTimeout(() => {
-    if (getUserId()) {   // Check if we've logged out
+  const id = setTimeout(() => {
+    if (polls.includes(id)) {
       apiCall("job/feed", "GET", { start: start }, (data) => {
-        // Sort recent jobs first
-        data.sort((a, b) => {
-          return new Date(b.createdAt) - new Date(a.createdAt);
-        });
-        for (const i in nodes) {
-          updateJob(nodes[i], data[i]);
+        if (polls.includes(id)) {
+          // Sort recent jobs first
+          data.sort((a, b) => {
+            return new Date(b.createdAt) - new Date(a.createdAt);
+          });
+          for (const i in nodes) {
+            updateJob(nodes[i], data[i]);
+          }
+            liveUpdate(start, nodes);
         }
-        liveUpdate(start, nodes);
       });
     }
   }, 1000);
+  polls.push(id);
 };
 
 // clear === true will remove existing feed items before adding new
 const populateFeed = (start, clear = true) => {
+  if (clear) {
+    polls.length = 0; // Stop polling
+  }
   apiCall("job/feed", "GET", { start: start }, (data) => {
     // Sort recent jobs first
     data.sort((a, b) => {
@@ -384,11 +390,11 @@ const showProfile = (userId) => {
           return new Date(b.createdAt) - new Date(a.createdAt);
         });
         const toAdd = [];
-        let prom = createJobElement(user.jobs[0]);
+        let prom = createJobElement(user.jobs[0], true);
         for (let i = 1; i < user.jobs.length; i++) {
           prom = prom.then((jobDom) => {
             toAdd.push(jobDom);
-            return createJobElement(user.jobs[i]);
+            return createJobElement(user.jobs[i], true);
           });
         }
         prom.then((jobDom) => {
@@ -399,7 +405,6 @@ const showProfile = (userId) => {
           }
           toAdd.push(jobDom);
           jobs.appendChild(jobDom);
-          console.log("reached");
         });
       }
     })
@@ -517,6 +522,7 @@ document.getElementById("error-close").addEventListener("click", () => {
 document.getElementById("nav-job-feed").addEventListener("click", () => {
   hideAll();
   show("page-job-feed");
+  populateFeed(0, true);
 });
 
 // Navbar Create Job, show job post page
@@ -546,6 +552,7 @@ document.getElementById("login-register").addEventListener("click", () => {
 
 // logout button
 document.getElementById("logout").addEventListener("click", () => {
+  polls.length = 0;
   show("section-logged-out");
   hide("section-logged-in");
   localStorage.removeItem("token");
@@ -679,6 +686,11 @@ document.getElementById("btn-watch-search").addEventListener("click", () => {
   emailNode.value = "";
 });
 
+// Refresh job feed
+document.getElementById("feed-refresh").addEventListener("click", ()=> {
+  populateFeed(0, true);
+});
+
 // Scrolling
 const throttledScroll = throttle(() => {
   if (populateDone) {
@@ -699,6 +711,8 @@ var currentFeedIndex = 0;
 // Variable is stop scrolling from being triggered before finishing
 // the first populateFeed, happens on slow browsers (VLAB Firefox)
 var populateDone = false;
+// Keep track of polling, clear the list to stop liveUpdates
+var polls = []
 if (localStorage.getItem("token") && getUserId()) {
   show("section-logged-in");
   hide("section-logged-out");
