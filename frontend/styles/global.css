@@ -63,7 +63,9 @@ body {
 }
 .feed-image {
   flex: 1;
-  max-width: 100px;
+  max-width: 300;
+  max-height: 300px;
+  height: auto;
 }
 .feed-text {
   flex: 3;
