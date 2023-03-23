@@ -4,10 +4,11 @@ import {
   apiCall,
   clearChildren,
   cloneNode,
+  errorShow,
   getHoursMinutesSince,
   getUserDetails,
   getUserId,
-  errorShow,
+  isViewAtBottom,
   throttle,
 } from "./helpers.js";
 
@@ -269,6 +270,9 @@ const populateFeed = (start, clear = true) => {
       feed.appendChild(feedDom);
     }
     currentFeedIndex += data.length;
+    if (data.length !== 0 && isViewAtBottom()) {
+      populateFeed(currentFeedIndex, false);
+    }
     console.log("data", data);
   });
 };
@@ -631,7 +635,7 @@ const throttledScroll = throttle(() => {
   populateFeed(currentFeedIndex, false);
 }, 500);
 window.addEventListener("scroll", () => {
-  if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
+  if (isViewAtBottom()) {
     throttledScroll();
   }
 });
