@@ -105,6 +105,13 @@ export const getUserDetails = (userId) => {
     });
   });
 };
+
+// Get userId
+// localStorage converts things into string
+export const getUserId = () => {
+  return JSON.parse(localStorage.getItem("userId"));
+};
+
 // show error
 export const errorShow = (content) => {
   document.getElementById("error-popup").classList.remove("hide");

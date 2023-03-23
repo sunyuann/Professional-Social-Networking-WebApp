@@ -6,6 +6,7 @@ import {
   cloneNode,
   getHoursMinutesSince,
   getUserDetails,
+  getUserId,
   errorShow,
 } from "./helpers.js";
 
@@ -249,16 +250,21 @@ const createJobElement = (jobDetail, isJob = false) => {
   return feedDom;
 };
 
-const populateFeed = () => {
-  apiCall("job/feed", "GET", { start: 0 }, (data) => {
+// clear === true will remove existing feed items before adding new
+const populateFeed = (start, clear = true) => {
+  apiCall("job/feed", "GET", { start: start }, (data) => {
     // Sort recent jobs first
     data.sort((a, b) => {
       return new Date(b.createdAt) - new Date(a.createdAt);
     });
+    const feed = document.getElementById("feed-items");
+    if (clear) {
+      clearChildren(feed);
+    }
     for (const feedItem of data) {
       const feedDom = createJobElement(feedItem);
       // Put the thing in the thing
-      document.getElementById("feed-items").appendChild(feedDom);
+      feed.appendChild(feedDom);
     }
     console.log("data", data);
   });
@@ -266,12 +272,6 @@ const populateFeed = () => {
 
 const showProfile = (userId) => {
   hideAll();
-  const btn = document.getElementById("profile-edit");
-  if (userId == localStorage.getItem("userId")) {
-    btn.classList.remove("hide");
-  } else {
-    btn.classList.add("hide");
-  }
   // Populate page-profile
   getUserDetails(userId)
     .then((user) => {
@@ -280,6 +280,26 @@ const showProfile = (userId) => {
       pp.querySelector("#profile-email").innerText = user.email;
       pp.querySelector("#profile-name").innerText = user.name;
       pp.querySelector("#profile-image").innerText = user.image;
+      // Edit, Watch Buttons
+      const btnEdit = document.getElementById("profile-edit");
+      const btnWatch = document.getElementById("profile-watch");
+      if (userId === getUserId()) {
+        btnEdit.classList.remove("hide");
+        btnWatch.classList.add("hide");
+      } else {
+        btnEdit.classList.add("hide");
+        const isWatching = user.watcheeUserIds.includes(getUserId());
+        if (isWatching) {
+          btnWatch.value = "Unwatch";
+        } else {
+          btnWatch.value = "Watch";
+        }
+        btnWatch.classList.remove("hide");
+        // onclick to override, not add
+        btnWatch.onclick = () => {
+          watchClick(user.email, !isWatching, user.id);
+        };
+      }
       // Watch list
       const watchList = pp.querySelector("#profile-watched-list");
       const watchStart = pp.querySelector("#profile-watched-start");
@@ -334,8 +354,9 @@ const showProfile = (userId) => {
   show("page-profile");
 };
 
+// Populate the update profile screen with user info
 const updateProfile = () => {
-  getUserDetails(localStorage.getItem("userId"))
+  getUserDetails(getUserId())
     .then((user) => {
       const pu = document.getElementById("page-profile-update");
       pu.querySelector("#update-email").value = user.email;
@@ -362,7 +383,7 @@ const setToken = (token, userId) => {
   show("section-logged-in");
   hide("section-logged-out");
   hide("error-popup");
-  populateFeed();
+  populateFeed(0);
   updateProfile();
 };
 
@@ -450,7 +471,7 @@ document.getElementById("nav-job-post").addEventListener("click", () => {
 
 // Navbar Me, show your profile page
 document.getElementById("nav-profile-me").addEventListener("click", () => {
-  showProfile(localStorage.getItem("userId"));
+  showProfile(getUserId());
 });
 
 // Register page, login button
@@ -517,9 +538,9 @@ document.getElementById("create-job").addEventListener("click", () => {
     });
 });
 
-// Page update profile
+// Click edit profile
 document.getElementById("profile-edit").addEventListener("click", () => {
-  if (localStorage.getItem("userId")) {
+  if (getUserId()) {
     hideAll();
     show("page-profile-update");
   } else {
@@ -527,7 +548,7 @@ document.getElementById("profile-edit").addEventListener("click", () => {
   }
 });
 
-// Update profile
+// Save update profile
 document.getElementById("update-profile").addEventListener("click", () => {
   const passwordDom = document.getElementById("update-password");
   const imageDom = document.getElementById("update-image");
@@ -535,7 +556,7 @@ document.getElementById("update-profile").addEventListener("click", () => {
   if (passwordDom.value.length > 0) {
     payload.password = passwordDom.value;
   }
-  getUserDetails(localStorage.getItem("userId"))
+  getUserDetails(getUserId())
     .then((user) => {
       const updateEmail = document.getElementById("update-email");
       const updateName = document.getElementById("update-name");
@@ -548,7 +569,7 @@ document.getElementById("update-profile").addEventListener("click", () => {
       const upload = (payload) => {
         apiCall("user", "PUT", payload, () => {
           hideAll();
-          showProfile(localStorage.getItem("userId"));
+          showProfile(getUserId());
         });
       };
       if (imageDom.files.length > 0) {
@@ -575,17 +596,41 @@ document
   .getElementById("update-profile-cancel")
   .addEventListener("click", () => {
     hideAll();
-    showProfile(localStorage.getItem("userId"));
+    showProfile(getUserId());
   });
+
+// Watch profile - needs email context, so addEventListener not defined here.
+// Email is string, turnon is boolean
+// userId: a number (will show this profile, null won't redirect to profile)
+// Refreshes the feed as well
+const watchClick = (email, turnon, userId) => {
+  const payload = {
+    email: email,
+    turnon: turnon,
+  };
+  apiCall("user/watch", "PUT", payload, () => {
+    if (userId !== null) {
+      showProfile(userId);
+    }
+    populateFeed(0, true);
+  });
+};
+
+// Watch email button on feed page
+document.getElementById("btn-watch-search").addEventListener("click", () => {
+  const emailNode = document.getElementById("watch-search-email");
+  watchClick(emailNode.value, true, null);
+  emailNode.value = "";
+});
 
 ////////////////
 // Main logic //
 ////////////////
-if (localStorage.getItem("token") && localStorage.getItem("userId")) {
+if (localStorage.getItem("token") && getUserId()) {
   show("section-logged-in");
   hide("section-logged-out");
   hide("error-popup");
-  populateFeed();
+  populateFeed(0);
   updateProfile();
   console.log(localStorage.getItem("token"));
 }
