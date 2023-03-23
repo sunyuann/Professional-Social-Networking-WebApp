@@ -88,6 +88,12 @@ export const cloneNode = (element) => {
   return newElem;
 };
 
+// show error
+export const errorShow = (content) => {
+  document.getElementById("error-popup").classList.remove("hide");
+  document.getElementById("error-content").textContent = content;
+};
+
 // Returns [hours, minutes] where hours and minutes are ints
 export const getHoursMinutesSince = (datetimestr) => {
   const ms = new Date() - new Date(datetimestr);
@@ -112,10 +118,9 @@ export const getUserId = () => {
   return JSON.parse(localStorage.getItem("userId"));
 };
 
-// show error
-export const errorShow = (content) => {
-  document.getElementById("error-popup").classList.remove("hide");
-  document.getElementById("error-content").textContent = content;
+// Returns true if viewport? is at bottom of window
+export const isViewAtBottom = () => {
+  return window.innerHeight + window.scrollY >= document.body.offsetHeight;
 };
 
 // Throttle an action, period is in milliseconds
