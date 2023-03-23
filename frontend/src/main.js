@@ -23,9 +23,7 @@ const hide = (element) => {
   document.getElementById(element).classList.add("hide");
 };
 
-const createJobElement = (jobDetail, isJob = false) => {
-  const baseFeedItem = document.getElementById("feed-item");
-  const feedDom = cloneNode(baseFeedItem);
+const updateJob = (feedDom, jobDetail) => {
   // Update fields
   feedDom.querySelector(".feed-image").src = jobDetail.image;
   feedDom.querySelector(".feed-title").innerText = jobDetail.title;
@@ -33,16 +31,18 @@ const createJobElement = (jobDetail, isJob = false) => {
   feedDom.querySelector(".feed-description").innerText = jobDetail.description;
   feedDom.querySelector(".feed-likes").innerText =
     "Likes: " + jobDetail.likes.length;
-  // get liked list
+  // Do likes list
   const likedList = feedDom.querySelector(".feed-likes-list");
-  let likeStart = "";
+  const likesStart = feedDom.querySelector(".feed-likes-start");
+  clearChildren(likedList);
+  likedList.appendChild(likesStart);
+  let likeStr = "";
   if (jobDetail.likes.length === 0) {
-    likeStart += "Liked by no one";
+    likeStr += "Liked by no one";
   } else {
-    likeStart += "Liked by ";
+    likeStr += "Liked by ";
     const likeName = feedDom.querySelector(".feed-likes-name");
     const likeSep = feedDom.querySelector(".feed-likes-sep");
-    // Add the list
     for (const i in jobDetail.likes) {
       if (i > 0) {
         const dupSep = cloneNode(likeSep);
@@ -56,59 +56,32 @@ const createJobElement = (jobDetail, isJob = false) => {
       likedList.appendChild(dupName);
     }
   }
-  feedDom.querySelector(".feed-likes-start").innerText = likeStart;
-  // toggling show and hide feed likes list
-  feedDom.querySelector(".feed-likes").addEventListener("click", () => {
-    if (likedList.classList.contains("hide")) {
-      likedList.classList.remove("hide");
-    } else {
-      likedList.classList.add("hide");
-    }
-  });
-
-  let likeButtonTurnOn = true;
-  // console.log(jobDetail.likes[0].userId);
-  for (var i = 0; i < jobDetail.likes.length; i++) {
-    // TODO: replace 65687 with user's actual id
-    if (jobDetail.likes[i].userId === 65687) {
-      likeButtonTurnOn = false;
+  likesStart.innerText = likeStr;
+  // Set like button text
+  let userLikes = false;
+  for (let info of jobDetail.likes) {
+    if (info.userId === getUserId()) {
+      userLikes = true;
+      break;
     }
   }
-  if (likeButtonTurnOn) {
-    feedDom.querySelector(".feed-like-button").value = "Like";
-  } else {
+  if (userLikes) {
     feedDom.querySelector(".feed-like-button").value = "Unlike";
+  } else {
+    feedDom.querySelector(".feed-like-button").value = "Like";
   }
-  likeButtonTurnOn = !likeButtonTurnOn;
-  // like button
-  feedDom
-    .querySelector(".feed-like-button")
-    .setAttribute("id", "feed-like-button_" + jobDetail.id);
-  feedDom.querySelector(".feed-like-button").addEventListener("click", () => {
-    // like/dislike button
-    const payload = {
-      id: jobDetail.id,
-      turnon: !likeButtonTurnOn,
-    };
-    apiCall("job/like", "PUT", payload, () => {});
-    if (likeButtonTurnOn) {
-      feedDom.querySelector(".feed-like-button").value = "Like";
-    } else {
-      feedDom.querySelector(".feed-like-button").value = "Unlike";
-    }
-    likeButtonTurnOn = !likeButtonTurnOn;
-  });
-
   feedDom.querySelector(".feed-comments").innerText =
     "Comments: " + jobDetail.comments.length;
-  // get comment list
+  // Do comments
   const commentsList = feedDom.querySelector(".feed-comments-list");
-  let commentStart = "";
+  const commentsStart = feedDom.querySelector(".feed-comments-start");
+  clearChildren(commentsList);
+  commentsList.appendChild(commentsStart);
+  let commentStr = "";
   if (jobDetail.comments.length === 0) {
-    commentStart += "No comments yet";
+    commentStr += "No comments yet";
   } else {
     const commentItem = feedDom.querySelector(".feed-comments-item");
-    // Add the list
     for (const com of jobDetail.comments) {
       const dupCom = cloneNode(commentItem);
       const dupName = dupCom.querySelector(".feed-comments-name");
@@ -121,8 +94,46 @@ const createJobElement = (jobDetail, isJob = false) => {
       commentsList.appendChild(dupCom);
     }
   }
-  feedDom.querySelector(".feed-comments-start").innerText = commentStart;
+  commentsStart.innerText = commentStr;
+  // Update job created string
+  let createStr = jobDetail.createdAt.split("T")[0];
+  const [hours, minutes] = getHoursMinutesSince(jobDetail.createdAt);
+  if (hours < 24) {
+    createStr = `${hours} hours, ${minutes} minutes ago`;
+  }
+  feedDom.querySelector(".feed-created").innerText = createStr;
+};
+
+const createJobElement = (jobDetail, editable = false) => {
+  const baseFeedItem = document.getElementById("feed-item");
+  const feedDom = cloneNode(baseFeedItem);
+  // toggling show and hide feed likes list
+  const likedList = feedDom.querySelector(".feed-likes-list");
+  feedDom.querySelector(".feed-likes").addEventListener("click", () => {
+    if (likedList.classList.contains("hide")) {
+      likedList.classList.remove("hide");
+    } else {
+      likedList.classList.add("hide");
+    }
+  });
+  // like button event handler
+  feedDom.querySelector(".feed-like-button").addEventListener("click", () => {
+    const btnLike = feedDom.querySelector(".feed-like-button");
+    const userLikes = btnLike.value === "Unlike";
+    const payload = {
+      id: jobDetail.id,
+      turnon: !userLikes,
+    };
+    apiCall("job/like", "PUT", payload, () => {
+      if (userLikes) {
+        btnLike.value = "Like";
+      } else {
+        btnLike.value = "Unlike";
+      }
+    });
+  });
   // toggling show and hide feed comments list
+  const commentsList = feedDom.querySelector(".feed-comments-list");
   feedDom.querySelector(".feed-comments").addEventListener("click", () => {
     if (commentsList.classList.contains("hide")) {
       commentsList.classList.remove("hide");
@@ -130,7 +141,6 @@ const createJobElement = (jobDetail, isJob = false) => {
       commentsList.classList.add("hide");
     }
   });
-
   // post comment
   const feedComment = feedDom.querySelector(".feed-comment");
   feedDom
@@ -151,16 +161,8 @@ const createJobElement = (jobDetail, isJob = false) => {
         errorShow("Comment can't be empty, please try again.");
       }
     });
-
-  // Update job created string
-  let createStr = jobDetail.createdAt.split("T")[0];
-  const [hours, minutes] = getHoursMinutesSince(jobDetail.createdAt);
-  if (hours < 24) {
-    createStr = `${hours} hours, ${minutes} minutes ago`;
-  }
-  feedDom.querySelector(".feed-created").innerText = createStr;
-
-  if (isJob) {
+  // Show/hide edit, delete buttons
+  if (editable) {
     feedDom.querySelector(".jobs-update-delete").classList.remove("hide");
     // edit button show form
     feedDom.querySelector(".job-edit-button").addEventListener("click", () => {
@@ -173,7 +175,6 @@ const createJobElement = (jobDetail, isJob = false) => {
         feedDom.querySelector("#page-job-post-update").classList.add("hide");
       }
     });
-
     // update job button
     feedDom
       .querySelector(".update-job-button")
@@ -223,7 +224,6 @@ const createJobElement = (jobDetail, isJob = false) => {
             console.log("Image not found", error);
           });
       });
-
     // delete job button
     feedDom
       .querySelector(".job-delete-button")
@@ -238,8 +238,10 @@ const createJobElement = (jobDetail, isJob = false) => {
         });
       });
   }
+  // Update fields, likes list, like button text, comments, created string
+  updateJob(feedDom, jobDetail);
+  // Fetch creator name and update
   return new Promise((resolve, reject) => {
-    // Fetch creator name and update
     getUserDetails(jobDetail.creatorId)
       .then((creator) => {
         feedDom.querySelector(".feed-creator").innerText = creator.name;
@@ -252,6 +254,24 @@ const createJobElement = (jobDetail, isJob = false) => {
         console.log("TODO populateFeed getUserDetails ERROR! ", error);
       });
   });
+};
+
+// Live updates
+const liveUpdate = (start, nodes) => {
+  setTimeout(() => {
+    if (getUserId()) {   // Check if we've logged out
+      apiCall("job/feed", "GET", { start: start }, (data) => {
+        // Sort recent jobs first
+        data.sort((a, b) => {
+          return new Date(b.createdAt) - new Date(a.createdAt);
+        });
+        for (const i in nodes) {
+          updateJob(nodes[i], data[i]);
+        }
+        liveUpdate(start, nodes);
+      });
+    }
+  }, 1000);
 };
 
 // clear === true will remove existing feed items before adding new
@@ -267,19 +287,24 @@ const populateFeed = (start, clear = true) => {
       currentFeedIndex = 0;
     }
     if (data.length > 0) {
+      const nodes = [];
       let prom = createJobElement(data[0]);
       for (let i = 1; i < data.length; i++) {
         prom = prom.then((feedDom) => {
           feed.appendChild(feedDom);
+          nodes.push(feedDom);
           return createJobElement(data[i]);
         });
       }
       prom.then((feedDom) => {
         feed.appendChild(feedDom);
+        nodes.push(feedDom);
         currentFeedIndex += data.length;
+        liveUpdate(start, nodes);
         if (data.length !== 0 && isViewAtBottom()) {
           populateFeed(currentFeedIndex, false);
         }
+        populateDone = true;
       });
     }
     console.log("data", data);
@@ -372,7 +397,9 @@ const showProfile = (userId) => {
           for (const node of toAdd) {
             jobs.appendChild(node);
           }
+          toAdd.push(jobDom);
           jobs.appendChild(jobDom);
+          console.log("reached");
         });
       }
     })
@@ -406,6 +433,7 @@ const hideAll = () => {
 
 // Save token and userId
 const setToken = (token, userId) => {
+  populateDone = false;
   localStorage.setItem("token", token);
   localStorage.setItem("userId", userId);
   show("section-logged-in");
@@ -653,10 +681,12 @@ document.getElementById("btn-watch-search").addEventListener("click", () => {
 
 // Scrolling
 const throttledScroll = throttle(() => {
-  populateFeed(currentFeedIndex, false);
+  if (populateDone) {
+    populateFeed(currentFeedIndex, false);
+  }
 }, 500);
 window.addEventListener("scroll", () => {
-  if (isViewAtBottom()) {
+  if (isViewAtBottom() && getUserId()) {
     throttledScroll();
   }
 });
@@ -666,6 +696,9 @@ window.addEventListener("scroll", () => {
 ////////////////
 // The start index you should give /job/feed to get next feed items
 var currentFeedIndex = 0;
+// Variable is stop scrolling from being triggered before finishing
+// the first populateFeed, happens on slow browsers (VLAB Firefox)
+var populateDone = false;
 if (localStorage.getItem("token") && getUserId()) {
   show("section-logged-in");
   hide("section-logged-out");
