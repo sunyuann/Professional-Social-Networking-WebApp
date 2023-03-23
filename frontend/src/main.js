@@ -56,7 +56,6 @@ const createJobElement = (jobDetail, isJob = false) => {
   feedDom.querySelector(".feed-likes-start").innerText = likeStart;
   // toggling show and hide feed likes list
   feedDom.querySelector(".feed-likes").addEventListener("click", () => {
-    console.log("likedList:", likedList);
     if (likedList.classList.contains("hide")) {
       likedList.classList.remove("hide");
     } else {
@@ -184,59 +183,68 @@ const createJobElement = (jobDetail, isJob = false) => {
     });
 
     // update job button
-    feedDom.querySelector(".update-job-button").addEventListener("click", () => {
-      const title = feedDom.querySelector("#job-post-update-title").value;
-      const description = feedDom.querySelector("#job-post-update-description").value;
-      const start = feedDom.querySelector("#job-post-update-start").value;
-      // error checking
-      if (title === "") {
-        errorShow("Please enter a title");
-        return;
-      } else if (feedDom.querySelector("#job-post-update-image").files.length === 0) {
-        errorShow("Please upload an image");
-        return;
-      } else if (start === "") {
-        errorShow("Please select a date");
-      } else if (description === "") {
-        errorShow("Please enter a description");
-        return;
-      }
-      // convert to base64, then create job
-      const image_file = feedDom.querySelector("#job-post-update-image").files[0];
-      fileToDataUrl(image_file)
-        .then((image) => {
-          console.log(image);
-          const payload = {
-            id: jobDetail.id,
-            title: title,
-            image: image,
-            start: new Date(start).toISOString(),
-            description: description,
-          };
-          apiCall("job", "PUT", payload, () => {
-            feedDom.querySelector("#job-post-update-title").value = "";
-            feedDom.querySelector("#job-post-update-image").value = "";
-            feedDom.querySelector("#job-post-update-start").value = "";
-            feedDom.querySelector("#job-post-update-description").value = "";
+    feedDom
+      .querySelector(".update-job-button")
+      .addEventListener("click", () => {
+        const title = feedDom.querySelector("#job-post-update-title").value;
+        const description = feedDom.querySelector(
+          "#job-post-update-description"
+        ).value;
+        const start = feedDom.querySelector("#job-post-update-start").value;
+        // error checking
+        if (title === "") {
+          errorShow("Please enter a title");
+          return;
+        } else if (
+          feedDom.querySelector("#job-post-update-image").files.length === 0
+        ) {
+          errorShow("Please upload an image");
+          return;
+        } else if (start === "") {
+          errorShow("Please select a date");
+        } else if (description === "") {
+          errorShow("Please enter a description");
+          return;
+        }
+        // convert to base64, then create job
+        const image_file = feedDom.querySelector("#job-post-update-image")
+          .files[0];
+        fileToDataUrl(image_file)
+          .then((image) => {
+            console.log(image);
+            const payload = {
+              id: jobDetail.id,
+              title: title,
+              image: image,
+              start: new Date(start).toISOString(),
+              description: description,
+            };
+            apiCall("job", "PUT", payload, () => {
+              feedDom.querySelector("#job-post-update-title").value = "";
+              feedDom.querySelector("#job-post-update-image").value = "";
+              feedDom.querySelector("#job-post-update-start").value = "";
+              feedDom.querySelector("#job-post-update-description").value = "";
+            });
+            hide("error-popup");
+          })
+          .catch((error) => {
+            console.log("Image not found", error);
           });
-          hide("error-popup");
-        })
-        .catch((error) => {
-          console.log("Image not found", error);
-        });
-    });
+      });
 
     // delete job button
-    feedDom.querySelector(".job-delete-button").addEventListener("click", () => {
-      const payload = {
-        id: jobDetail.id,
-      };
-      apiCall("job", "DELETE", payload, () => {
-        feedDom.classList.add("hide");
-        console.log("SUCCESS");
-        hide("error-popup");
+    feedDom
+      .querySelector(".job-delete-button")
+      .addEventListener("click", () => {
+        const payload = {
+          id: jobDetail.id,
+        };
+        apiCall("job", "DELETE", payload, () => {
+          feedDom.classList.add("hide");
+          console.log("SUCCESS");
+          hide("error-popup");
+        });
       });
-    });
   }
   return feedDom;
 };
@@ -257,14 +265,18 @@ const populateFeed = () => {
 };
 
 const showProfile = (userId) => {
-  // TODO Hide everything else
-  hide("page-job-feed");
-  hide("page-job-post");
-
-  // Populate profile-page
+  hideAll();
+  const btn = document.getElementById("profile-edit");
+  if (userId == localStorage.getItem("userId")) {
+    btn.classList.remove("hide");
+  } else {
+    btn.classList.add("hide");
+  }
+  // Populate page-profile
   getUserDetails(userId)
     .then((user) => {
-      const pp = document.getElementById("profile-page");
+      const pp = document.getElementById("page-profile");
+      pp.querySelector("#profile-userid").innerText = user.id;
       pp.querySelector("#profile-email").innerText = user.email;
       pp.querySelector("#profile-name").innerText = user.name;
       pp.querySelector("#profile-image").innerText = user.image;
@@ -274,7 +286,7 @@ const showProfile = (userId) => {
       const watchName = pp.querySelector(".profile-watched-name");
       const watchSep = pp.querySelector(".profile-watched-sep");
       let watchString = `Watched by ${user.watcheeUserIds.length} users`;
-      watchString += `${user.watcheeUserIds.length > 0 ? ":" : "."}`;
+      watchString += `${user.watcheeUserIds.length > 0 ? ": " : "."}`;
       watchStart.innerText = watchString;
       clearChildren(watchList);
       watchList.append(watchStart);
@@ -306,6 +318,10 @@ const showProfile = (userId) => {
         jobs.innerText = "No jobs.";
       } else {
         jobs.innerText = "Jobs:";
+        // Most recent first
+        user.jobs.sort((a, b) => {
+          return new Date(b.createdAt) - new Date(a.createdAt);
+        });
         for (const job of user.jobs) {
           const jobDom = createJobElement(job, true);
           jobs.appendChild(jobDom);
@@ -315,15 +331,39 @@ const showProfile = (userId) => {
     .catch((error) => {
       console.log("TODO showProfile getUserDetails ERROR! ", error);
     });
-  show("profile-page");
+  show("page-profile");
 };
 
-const setToken = (token) => {
+const updateProfile = () => {
+  getUserDetails(localStorage.getItem("userId"))
+    .then((user) => {
+      const pu = document.getElementById("page-profile-update");
+      pu.querySelector("#update-email").value = user.email;
+      pu.querySelector("#update-name").value = user.name;
+    })
+    .catch((error) => {
+      console.log("TODO showProfile getUserDetails ERROR! ", error);
+    });
+};
+
+// Hides all pages
+const hideAll = () => {
+  hide("page-job-feed");
+  hide("page-job-post");
+  hide("page-profile");
+  hide("page-profile-update");
+  hide("error-popup");
+};
+
+// Save token and userId
+const setToken = (token, userId) => {
   localStorage.setItem("token", token);
+  localStorage.setItem("userId", userId);
   show("section-logged-in");
   hide("section-logged-out");
   hide("error-popup");
   populateFeed();
+  updateProfile();
 };
 
 ////////////////////////////////
@@ -338,7 +378,7 @@ document.getElementById("login-login").addEventListener("click", () => {
     password: document.getElementById("login-password").value,
   };
   apiCall("auth/login", "POST", payload, (data) => {
-    setToken(data.token);
+    setToken(data.token, data.userId);
     hide("error-popup");
   });
 });
@@ -374,7 +414,7 @@ document.getElementById("register-register").addEventListener("click", () => {
     name: document.getElementById("register-name").value,
   };
   apiCall("auth/register", "POST", payload, (data) => {
-    setToken(data.token);
+    setToken(data.token, userId);
   });
   //document.getElementById("register-form").submit();
 });
@@ -390,25 +430,27 @@ document.getElementById("error-close").addEventListener("click", () => {
 //   hide("page-login");
 // });
 
+// Navbar login, show login page
+// document.getElementById("nav-login").addEventListener("click", () => {
+//   show("page-login");
+//   hide("page-register");
+// });
+
 // Navbar Job Feed, show job feed page
 document.getElementById("nav-job-feed").addEventListener("click", () => {
+  hideAll();
   show("page-job-feed");
-  hide("page-job-post");
-  hide("profile-page");
 });
 
 // Navbar Create Job, show job post page
 document.getElementById("nav-job-post").addEventListener("click", () => {
+  hideAll();
   show("page-job-post");
-  hide("page-job-feed");
-  hide("profile-page");
 });
 
 // Navbar Me, show your profile page
 document.getElementById("nav-profile-me").addEventListener("click", () => {
-  showProfile(97467); // TODO save logged in userId
-  hide("page-job-feed");
-  hide("page-job-post");
+  showProfile(localStorage.getItem("userId"));
 });
 
 // Register page, login button
@@ -425,17 +467,12 @@ document.getElementById("login-register").addEventListener("click", () => {
   hide("page-login");
 });
 
-// // Login register, show login page
-// document.getElementById("nav-login").addEventListener("click", () => {
-//   show("page-login");
-//   hide("page-register");
-// });
-
-// if token does not exist, display logged out section
+// logout button
 document.getElementById("logout").addEventListener("click", () => {
   show("section-logged-out");
   hide("section-logged-in");
   localStorage.removeItem("token");
+  localStorage.removeItem("userId");
 });
 
 // creating job
@@ -480,14 +517,76 @@ document.getElementById("create-job").addEventListener("click", () => {
     });
 });
 
+// Page update profile
+document.getElementById("profile-edit").addEventListener("click", () => {
+  if (localStorage.getItem("userId")) {
+    hideAll();
+    show("page-profile-update");
+  } else {
+    errorShow("You're not logged in");
+  }
+});
+
+// Update profile
+document.getElementById("update-profile").addEventListener("click", () => {
+  const passwordDom = document.getElementById("update-password");
+  const imageDom = document.getElementById("update-image");
+  const payload = {};
+  if (passwordDom.value.length > 0) {
+    payload.password = passwordDom.value;
+  }
+  getUserDetails(localStorage.getItem("userId"))
+    .then((user) => {
+      const updateEmail = document.getElementById("update-email");
+      const updateName = document.getElementById("update-name");
+      if (updateEmail.value !== user.email) {
+        payload.email = updateEmail.value;
+      }
+      if (updateName.value !== user.name) {
+        payload.name = updateName.value;
+      }
+      const upload = (payload) => {
+        apiCall("user", "PUT", payload, () => {
+          hideAll();
+          showProfile(localStorage.getItem("userId"));
+        });
+      };
+      if (imageDom.files.length > 0) {
+        fileToDataUrl(imageDom.files[0])
+          .then((image) => {
+            payload.image = image;
+            upload(payload);
+          })
+          .catch((error) => {
+            errorShow("Provided profile image is not a png, jpg or jpeg.");
+            imageError = true;
+          });
+      } else {
+        upload(payload);
+      }
+    })
+    .catch((error) => {
+      console.log("TODO getUserDetails update profile ERROR! ", error);
+    });
+});
+
+// Update profile cancel
+document
+  .getElementById("update-profile-cancel")
+  .addEventListener("click", () => {
+    hideAll();
+    showProfile(localStorage.getItem("userId"));
+  });
+
 ////////////////
 // Main logic //
 ////////////////
-if (localStorage.getItem("token")) {
+if (localStorage.getItem("token") && localStorage.getItem("userId")) {
   show("section-logged-in");
   hide("section-logged-out");
   hide("error-popup");
   populateFeed();
+  updateProfile();
   console.log(localStorage.getItem("token"));
 }
 const curr_date = new Date();

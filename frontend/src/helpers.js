@@ -20,7 +20,9 @@ export function fileToDataUrl(file) {
   const valid = validFileTypes.find((type) => type === file.type);
   // Bad data, let's walk away.
   if (!valid) {
-    throw Error("provided file is not a png, jpg or jpeg image.");
+    return Promise.reject(
+      new Error("provided file is not a png, jpg or jpeg image.")
+    );
   }
 
   const reader = new FileReader();
@@ -69,8 +71,12 @@ export const apiCall = (path, method, body, success) => {
 };
 
 export const clearChildren = (element) => {
-  while (element.firstChild) {
-    element.removeChild(element.firstChild);
+  const children = element.children;
+  for (let i = children.length - 1; i >= 0; i--) {
+    const child = children[i];
+    if (!child.classList.contains("hide")) {
+      element.removeChild(child);
+    }
   }
 };
 
