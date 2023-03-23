@@ -152,17 +152,6 @@ const createJobElement = (jobDetail, isJob = false) => {
       }
     });
 
-  // Fetch creator name and update
-  getUserDetails(jobDetail.creatorId)
-    .then((creator) => {
-      feedDom.querySelector(".feed-creator").innerText = creator.name;
-      feedDom.querySelector(".feed-creator").addEventListener("click", () => {
-        showProfile(jobDetail.creatorId);
-      });
-    })
-    .catch((error) => {
-      console.log("TODO populateFeed getUserDetails ERROR! ", error);
-    });
   // Update job created string
   let createStr = jobDetail.createdAt.split("T")[0];
   const [hours, minutes] = getHoursMinutesSince(jobDetail.createdAt);
@@ -249,7 +238,20 @@ const createJobElement = (jobDetail, isJob = false) => {
         });
       });
   }
-  return feedDom;
+  return new Promise((resolve, reject) => {
+    // Fetch creator name and update
+    getUserDetails(jobDetail.creatorId)
+      .then((creator) => {
+        feedDom.querySelector(".feed-creator").innerText = creator.name;
+        feedDom.querySelector(".feed-creator").addEventListener("click", () => {
+          showProfile(jobDetail.creatorId);
+        });
+        resolve(feedDom);
+      })
+      .catch((error) => {
+        console.log("TODO populateFeed getUserDetails ERROR! ", error);
+      });
+  });
 };
 
 // clear === true will remove existing feed items before adding new
@@ -264,14 +266,21 @@ const populateFeed = (start, clear = true) => {
       clearChildren(feed);
       currentFeedIndex = 0;
     }
-    for (const feedItem of data) {
-      const feedDom = createJobElement(feedItem);
-      // Put the thing in the thing
-      feed.appendChild(feedDom);
-    }
-    currentFeedIndex += data.length;
-    if (data.length !== 0 && isViewAtBottom()) {
-      populateFeed(currentFeedIndex, false);
+    if (data.length > 0) {
+      let prom = createJobElement(data[0]);
+      for (let i = 1; i < data.length; i++) {
+        prom = prom.then((feedDom) => {
+          feed.appendChild(feedDom);
+          return createJobElement(data[i]);
+        });
+      }
+      prom.then((feedDom) => {
+        feed.appendChild(feedDom);
+        currentFeedIndex += data.length;
+        if (data.length !== 0 && isViewAtBottom()) {
+          populateFeed(currentFeedIndex, false);
+        }
+      });
     }
     console.log("data", data);
   });
@@ -344,15 +353,27 @@ const showProfile = (userId) => {
       if (user.jobs.length === 0) {
         jobs.innerText = "No jobs.";
       } else {
-        jobs.innerText = "Jobs:";
+        jobs.innerText = "Jobs: loading...";
         // Most recent first
         user.jobs.sort((a, b) => {
           return new Date(b.createdAt) - new Date(a.createdAt);
         });
-        for (const job of user.jobs) {
-          const jobDom = createJobElement(job, true);
-          jobs.appendChild(jobDom);
+        const toAdd = [];
+        let prom = createJobElement(user.jobs[0]);
+        for (let i = 1; i < user.jobs.length; i++) {
+          prom = prom.then((jobDom) => {
+            toAdd.push(jobDom);
+            return createJobElement(user.jobs[i]);
+          });
         }
+        prom.then((jobDom) => {
+          clearChildren(jobs);
+          jobs.innerText = "Jobs:";
+          for (const node of toAdd) {
+            jobs.appendChild(node);
+          }
+          jobs.appendChild(jobDom);
+        });
       }
     })
     .catch((error) => {
