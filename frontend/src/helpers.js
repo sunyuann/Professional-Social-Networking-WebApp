@@ -117,3 +117,17 @@ export const errorShow = (content) => {
   document.getElementById("error-popup").classList.remove("hide");
   document.getElementById("error-content").textContent = content;
 };
+
+// Throttle an action, period is in milliseconds
+// Returns a function to be passed to an event handler
+export const throttle = (func, period) => {
+  let timer = null;
+  return () => {
+    if (!timer) {
+      func();
+      timer = setTimeout(() => {
+        timer = null;
+      }, period);
+    }
+  };
+};

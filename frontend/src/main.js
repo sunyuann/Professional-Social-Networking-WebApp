@@ -8,6 +8,7 @@ import {
   getUserDetails,
   getUserId,
   errorShow,
+  throttle,
 } from "./helpers.js";
 
 ///////////////
@@ -260,12 +261,14 @@ const populateFeed = (start, clear = true) => {
     const feed = document.getElementById("feed-items");
     if (clear) {
       clearChildren(feed);
+      currentFeedIndex = 0;
     }
     for (const feedItem of data) {
       const feedDom = createJobElement(feedItem);
       // Put the thing in the thing
       feed.appendChild(feedDom);
     }
+    currentFeedIndex += data.length;
     console.log("data", data);
   });
 };
@@ -623,9 +626,21 @@ document.getElementById("btn-watch-search").addEventListener("click", () => {
   emailNode.value = "";
 });
 
+// Scrolling
+const throttledScroll = throttle(() => {
+  populateFeed(currentFeedIndex, false);
+}, 500);
+window.addEventListener("scroll", () => {
+  if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
+    throttledScroll();
+  }
+});
+
 ////////////////
 // Main logic //
 ////////////////
+// The start index you should give /job/feed to get next feed items
+var currentFeedIndex = 0;
 if (localStorage.getItem("token") && getUserId()) {
   show("section-logged-in");
   hide("section-logged-out");
