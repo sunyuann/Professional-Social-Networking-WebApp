@@ -1,3 +1,3 @@
 (optional) TODO!
 
-- Live update works for all items, not just first 5
+- Live update works for all feed items, not just first 5
