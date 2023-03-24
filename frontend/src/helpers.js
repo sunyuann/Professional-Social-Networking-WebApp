@@ -107,6 +107,21 @@ export const getHoursMinutesSince = (datetimestr) => {
   return [hours, minutes];
 };
 
+// Returns a promise with the name
+var nameDB = {};
+export const getNameFromId = (id) => {
+  return new Promise((resolve, reject) => {
+    if (nameDB[id]) {
+      resolve(nameDB[id]);
+    } else {
+      getUserDetails(id).then((data) => {
+        nameDB[id] = data.name;
+        resolve(data.name);
+      });
+    }
+  });
+};
+
 // Returns GET /user dictionary response from server
 export const getUserDetails = (userId) => {
   return new Promise((resolve, reject) => {
