@@ -55,18 +55,18 @@ export const apiCall = (path, method, body, success) => {
     options.headers.Authorization = `Bearer ${localStorage.getItem("token")}`;
   }
 
-  fetch(`http://localhost:${BACKEND_PORT}/` + path, options).then(
+  return fetch(`http://localhost:${BACKEND_PORT}/` + path, options).then(
     (response) => {
       response.json().then((data) => {
         if (data.error) {
           if (getUserId()) {
             errorShow(data.error);
           } else {
-            console.log("API call, but you logged out before it finished")
+            console.log("API call, but you logged out before it finished");
           }
         } else {
           if (success) {
-            success(data);
+            return Promise.resolve(success(data));
           }
         }
       });

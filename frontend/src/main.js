@@ -257,8 +257,12 @@ const createJobElement = (jobDetail, editable = false) => {
 };
 
 // Live updates
-const liveUpdate = (start, nodes) => {
-  const id = setTimeout(() => {
+// id is a number, identifying the polling chain
+// start is a number, represents the first index of the group of 5 jobs this is responsible of.
+// nodes is a list of nodes assocated with start
+// jobIds is the original list of job ids, to detect job adds/deletes
+const liveUpdate = (id, start, nodes, jobIds) => {
+  setTimeout(() => {
     if (polls.includes(id)) {
       apiCall("job/feed", "GET", { start: start }, (data) => {
         if (polls.includes(id)) {
@@ -267,22 +271,67 @@ const liveUpdate = (start, nodes) => {
             return new Date(b.createdAt) - new Date(a.createdAt);
           });
           for (const i in nodes) {
-            updateJob(nodes[i], data[i]);
+            if (data[i].id === jobIds[i]) {
+              updateJob(nodes[i], data[i]);
+            } else if (start === 0) {
+              // Only trigger for jobs 0-4
+              // Different job detected, this must be a new job
+              polls.length = 0;
+              console.log(
+                "Note to marker: Live Updates stopped because a job was added or deleted to the feed."
+              );
+              console.log("Please refresh feed to continue Live Updates");
+              if (notificationGranted) {
+                // Check if it's a job add or delete
+                let itsAdd = false;
+                for (let j = Number(i) + 1; j < data.length; j++) {
+                  if (data[j].id === jobIds[i]) {
+                    itsAdd = true;
+                    break;
+                  }
+                }
+                if (itsAdd) {
+                  const content = {};
+                  const name = nodes[i].querySelector(".feed-creator");
+                  if ((name && name.innerText) || true) {
+                    content.body = `${name.innerText} has posted a new job!\nClick Activate to refresh the feed.`;
+                  }
+                  const notif = new Notification("New Job Posted!", content);
+                  notif.onclick = (event) => {
+                    // Refresh feed page if notification clicked
+                    event.preventDefault();
+                    let prom = populateFeed(0);
+                    // TODO code to update bottom areas, need to restore scroll position
+                    // But document.body.style.minHeight = null seems to screw it up
+                    /*const cFI = currentFeedIndex;
+                    for (let i = 5; i < cFI; i += 5) {
+                      prom = prom.then(() => {
+                        return populateFeed(i, false);
+                      });
+                    }
+                    prom.then(() => {});*/
+                  };
+                }
+              }
+              break;
+            }
           }
-            liveUpdate(start, nodes);
+          if (polls.includes(id)) {
+            liveUpdate(id, start, nodes, jobIds);
+          }
         }
       });
     }
   }, 1000);
-  polls.push(id);
 };
 
 // clear === true will remove existing feed items before adding new
 const populateFeed = (start, clear = true) => {
   if (clear) {
     polls.length = 0; // Stop polling
+    populateDone = false;
   }
-  apiCall("job/feed", "GET", { start: start }, (data) => {
+  return apiCall("job/feed", "GET", { start: start }, (data) => {
     // Sort recent jobs first
     data.sort((a, b) => {
       return new Date(b.createdAt) - new Date(a.createdAt);
@@ -294,11 +343,14 @@ const populateFeed = (start, clear = true) => {
     }
     if (data.length > 0) {
       const nodes = [];
+      const jobIds = [];
+      jobIds.push(data[0].id);
       let prom = createJobElement(data[0]);
       for (let i = 1; i < data.length; i++) {
         prom = prom.then((feedDom) => {
           feed.appendChild(feedDom);
           nodes.push(feedDom);
+          jobIds.push(data[i].id);
           return createJobElement(data[i]);
         });
       }
@@ -306,7 +358,14 @@ const populateFeed = (start, clear = true) => {
         feed.appendChild(feedDom);
         nodes.push(feedDom);
         currentFeedIndex += data.length;
-        liveUpdate(start, nodes);
+        polls.push(currentPollId);
+        liveUpdate(currentPollId, start, nodes, jobIds);
+        if (currentPollId === Number.MAX_VALUE) {
+          // Make this happen naturally. Do it. I dare you.
+          currentPollId = 0;
+        } else {
+          currentPollId++;
+        }
         if (data.length !== 0 && isViewAtBottom()) {
           populateFeed(currentFeedIndex, false);
         }
@@ -436,16 +495,30 @@ const hideAll = () => {
   hide("error-popup");
 };
 
-// Save token and userId
-const setToken = (token, userId) => {
-  populateDone = false;
-  localStorage.setItem("token", token);
-  localStorage.setItem("userId", userId);
+const doUserLoginActions = () => {
   show("section-logged-in");
   hide("section-logged-out");
   hide("error-popup");
   populateFeed(0);
   updateProfile();
+  // Check browser supports notifications
+  if ("Notification" in window) {
+    Notification.requestPermission().then((perm) => {
+      if (perm === "granted") {
+        notificationGranted = true;
+      } else {
+        console.log("Note to marker: notification permission is not granted.");
+      }
+    });
+  }
+};
+
+// Save token and userId
+const setToken = (token, userId) => {
+  populateDone = false;
+  localStorage.setItem("token", token);
+  localStorage.setItem("userId", userId);
+  doUserLoginActions();
 };
 
 ////////////////////////////////
@@ -687,7 +760,7 @@ document.getElementById("btn-watch-search").addEventListener("click", () => {
 });
 
 // Refresh job feed
-document.getElementById("feed-refresh").addEventListener("click", ()=> {
+document.getElementById("feed-refresh").addEventListener("click", () => {
   populateFeed(0, true);
 });
 
@@ -712,13 +785,12 @@ var currentFeedIndex = 0;
 // the first populateFeed, happens on slow browsers (VLAB Firefox)
 var populateDone = false;
 // Keep track of polling, clear the list to stop liveUpdates
-var polls = []
+var polls = [];
+var currentPollId = 0;
+// Whether notification permission has been granted, asked on user log in
+var notificationGranted = false;
 if (localStorage.getItem("token") && getUserId()) {
-  show("section-logged-in");
-  hide("section-logged-out");
-  hide("error-popup");
-  populateFeed(0);
-  updateProfile();
+  doUserLoginActions();
   console.log(localStorage.getItem("token"));
 }
 const curr_date = new Date();
