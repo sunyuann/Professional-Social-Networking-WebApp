@@ -6,6 +6,7 @@ import {
   cloneNode,
   errorShow,
   getHoursMinutesSince,
+  getNameFromId,
   getUserDetails,
   getUserId,
   isViewAtBottom,
@@ -242,26 +243,31 @@ const createJobElement = (jobDetail, editable = false) => {
   updateJob(feedDom, jobDetail);
   // Fetch creator name and update
   return new Promise((resolve, reject) => {
-    getUserDetails(jobDetail.creatorId)
-      .then((creator) => {
-        feedDom.querySelector(".feed-creator").innerText = creator.name;
-        feedDom.querySelector(".feed-creator").addEventListener("click", () => {
-          showProfile(jobDetail.creatorId);
-        });
-        resolve(feedDom);
-      })
-      .catch((error) => {
-        console.log("TODO populateFeed getUserDetails ERROR! ", error);
+    getNameFromId(jobDetail.creatorId).then((name) => {
+      feedDom.querySelector(".feed-creator").innerText = name;
+      feedDom.querySelector(".feed-creator").addEventListener("click", () => {
+        showProfile(jobDetail.creatorId);
       });
+      resolve(feedDom);
+    });
   });
 };
 
 // Live updates
-// id is a number, identifying the polling chain
 // start is a number, represents the first index of the group of 5 jobs this is responsible of.
 // nodes is a list of nodes assocated with start
 // jobIds is the original list of job ids, to detect job adds/deletes
-const liveUpdate = (id, start, nodes, jobIds) => {
+const liveUpdate = (start, nodes, jobIds, id = null) => {
+  if (id === null) {
+    id = currentPollId;
+    polls.push(currentPollId);
+    if (currentPollId === Number.MAX_VALUE) {
+      // Make this happen naturally. Do it. I dare you.
+      currentPollId = 0;
+    } else {
+      currentPollId++;
+    }
+  }
   setTimeout(() => {
     if (polls.includes(id)) {
       apiCall("job/feed", "GET", { start: start }, (data) => {
@@ -270,54 +276,58 @@ const liveUpdate = (id, start, nodes, jobIds) => {
           data.sort((a, b) => {
             return new Date(b.createdAt) - new Date(a.createdAt);
           });
-          for (const i in nodes) {
-            if (data[i].id === jobIds[i]) {
-              updateJob(nodes[i], data[i]);
-            } else if (start === 0) {
-              // Only trigger for jobs 0-4
-              // Different job detected, this must be a new job
-              polls.length = 0;
-              console.log(
-                "Note to marker: Live Updates stopped because a job was added or deleted to the feed."
-              );
-              console.log("Please refresh feed to continue Live Updates");
-              if (notificationGranted) {
+          let die = false; // Stop polling or not
+          let itsAdd = false;
+          // Check if feed.length has changed
+          if (data.length === nodes.length) {
+            for (const i in nodes) {
+              if (data[i].id === jobIds[i]) {
+                updateJob(nodes[i], data[i]);
+              } else if (start === 0) {
+                // Only trigger for jobs 0-4
+                die = true;
                 // Check if it's a job add or delete
-                let itsAdd = false;
                 for (let j = Number(i) + 1; j < data.length; j++) {
                   if (data[j].id === jobIds[i]) {
                     itsAdd = true;
                     break;
                   }
                 }
-                if (itsAdd) {
-                  const content = {};
-                  const name = nodes[i].querySelector(".feed-creator");
-                  if ((name && name.innerText) || true) {
-                    content.body = `${name.innerText} has posted a new job!\nClick Activate to refresh the feed.`;
-                  }
+                break;
+              }
+            }
+          } else {
+            // Feed changed, stop Live Updates
+            die = true;
+            if (data.length > nodes.length) {
+              itsAdd = true;
+            }
+          }
+          if (die) {
+            polls.length = 0;
+            console.log(
+              `Note to marker: Live Updates stopped because a job was ${
+                itsAdd ? "added to" : "deleted from"
+              } the feed.`
+            );
+            console.log("Please refresh feed to continue Live Updates");
+            if (notificationGranted) {
+              if (itsAdd) {
+                const content = {};
+                getNameFromId(data[0].creatorId).then((name) => {
+                  content.body = `${name} has posted a new job!\nClick Activate to refresh the feed.`;
                   const notif = new Notification("New Job Posted!", content);
                   notif.onclick = (event) => {
                     // Refresh feed page if notification clicked
                     event.preventDefault();
-                    let prom = populateFeed(0);
-                    // TODO code to update bottom areas, need to restore scroll position
-                    // But document.body.style.minHeight = null seems to screw it up
-                    /*const cFI = currentFeedIndex;
-                    for (let i = 5; i < cFI; i += 5) {
-                      prom = prom.then(() => {
-                        return populateFeed(i, false);
-                      });
-                    }
-                    prom.then(() => {});*/
+                    populateFeed(0);
                   };
-                }
+                });
               }
-              break;
             }
           }
           if (polls.includes(id)) {
-            liveUpdate(id, start, nodes, jobIds);
+            liveUpdate(start, nodes, jobIds, id);
           }
         }
       });
@@ -358,19 +368,15 @@ const populateFeed = (start, clear = true) => {
         feed.appendChild(feedDom);
         nodes.push(feedDom);
         currentFeedIndex += data.length;
-        polls.push(currentPollId);
-        liveUpdate(currentPollId, start, nodes, jobIds);
-        if (currentPollId === Number.MAX_VALUE) {
-          // Make this happen naturally. Do it. I dare you.
-          currentPollId = 0;
-        } else {
-          currentPollId++;
-        }
+        liveUpdate(start, nodes, jobIds);
         if (data.length !== 0 && isViewAtBottom()) {
           populateFeed(currentFeedIndex, false);
         }
         populateDone = true;
       });
+    } else {
+      // This is for notifications
+      liveUpdate(0, [], []);
     }
     console.log("data", data);
   });
@@ -379,111 +385,97 @@ const populateFeed = (start, clear = true) => {
 const showProfile = (userId) => {
   hideAll();
   // Populate page-profile
-  getUserDetails(userId)
-    .then((user) => {
-      const pp = document.getElementById("page-profile");
-      pp.querySelector("#profile-userid").innerText = user.id;
-      pp.querySelector("#profile-email").innerText = user.email;
-      pp.querySelector("#profile-name").innerText = user.name;
-      pp.querySelector("#profile-image").innerText = user.image;
-      // Edit, Watch Buttons
-      const btnEdit = document.getElementById("profile-edit");
-      const btnWatch = document.getElementById("profile-watch");
-      if (userId === getUserId()) {
-        btnEdit.classList.remove("hide");
-        btnWatch.classList.add("hide");
+  getUserDetails(userId).then((user) => {
+    const pp = document.getElementById("page-profile");
+    pp.querySelector("#profile-userid").innerText = user.id;
+    pp.querySelector("#profile-email").innerText = user.email;
+    pp.querySelector("#profile-name").innerText = user.name;
+    pp.querySelector("#profile-image").innerText = user.image;
+    // Edit Button
+    const btnEdit = document.getElementById("profile-edit");
+    if (userId === getUserId()) {
+      btnEdit.classList.remove("hide");
+    } else {
+      btnEdit.classList.add("hide");
+    }
+    // Watch Button
+    const btnWatch = document.getElementById("profile-watch");
+    if (userId === getUserId() && !user.watcheeUserIds.includes(getUserId())) {
+      btnWatch.classList.add("hide");
+    } else {
+      const isWatching = user.watcheeUserIds.includes(getUserId());
+      if (isWatching) {
+        btnWatch.value = "Unwatch";
       } else {
-        btnEdit.classList.add("hide");
-        const isWatching = user.watcheeUserIds.includes(getUserId());
-        if (isWatching) {
-          btnWatch.value = "Unwatch";
-        } else {
-          btnWatch.value = "Watch";
-        }
-        btnWatch.classList.remove("hide");
-        // onclick to override, not add
-        btnWatch.onclick = () => {
-          watchClick(user.email, !isWatching, user.id);
-        };
+        btnWatch.value = "Watch";
       }
-      // Watch list
-      const watchList = pp.querySelector("#profile-watched-list");
-      const watchStart = pp.querySelector("#profile-watched-start");
-      const watchName = pp.querySelector(".profile-watched-name");
-      const watchSep = pp.querySelector(".profile-watched-sep");
-      let watchString = `Watched by ${user.watcheeUserIds.length} users`;
-      watchString += `${user.watcheeUserIds.length > 0 ? ": " : "."}`;
-      watchStart.innerText = watchString;
-      clearChildren(watchList);
-      watchList.append(watchStart);
-      for (const i in user.watcheeUserIds) {
-        const watcheeId = user.watcheeUserIds[i];
-        if (i > 0) {
-          const dupSep = cloneNode(watchSep);
-          watchList.appendChild(dupSep);
-        }
-        const dupName = cloneNode(watchName);
-        getUserDetails(watcheeId)
-          .then((watchee) => {
-            dupName.innerText = watchee.name;
-          })
-          .catch((error) => {
-            console.log(
-              `TODO showProfile getUserDetails forloop ${watcheeId} ERROR!`,
-              error
-            );
-          });
-        dupName.addEventListener("click", () => {
-          showProfile(watcheeId);
-        });
-        watchList.appendChild(dupName);
+      btnWatch.classList.remove("hide");
+      // using .onclick to override, not add another event handler
+      btnWatch.onclick = () => {
+        watchClick(user.email, !isWatching, user.id);
+      };
+    }
+    // Watch list
+    const watchList = pp.querySelector("#profile-watched-list");
+    const watchStart = pp.querySelector("#profile-watched-start");
+    const watchName = pp.querySelector(".profile-watched-name");
+    const watchSep = pp.querySelector(".profile-watched-sep");
+    let watchString = `Watched by ${user.watcheeUserIds.length} users`;
+    watchString += `${user.watcheeUserIds.length > 0 ? ": " : "."}`;
+    watchStart.innerText = watchString;
+    clearChildren(watchList);
+    watchList.append(watchStart);
+    for (const i in user.watcheeUserIds) {
+      const watcheeId = user.watcheeUserIds[i];
+      if (i > 0) {
+        const dupSep = cloneNode(watchSep);
+        watchList.appendChild(dupSep);
       }
-      // Jobs list
-      const jobs = pp.querySelector("#profile-jobs");
-      if (user.jobs.length === 0) {
-        jobs.innerText = "No jobs.";
-      } else {
-        jobs.innerText = "Jobs: loading...";
-        // Most recent first
-        user.jobs.sort((a, b) => {
-          return new Date(b.createdAt) - new Date(a.createdAt);
-        });
-        const toAdd = [];
-        let prom = createJobElement(user.jobs[0], true);
-        for (let i = 1; i < user.jobs.length; i++) {
-          prom = prom.then((jobDom) => {
-            toAdd.push(jobDom);
-            return createJobElement(user.jobs[i], true);
-          });
-        }
-        prom.then((jobDom) => {
-          clearChildren(jobs);
-          jobs.innerText = "Jobs:";
-          for (const node of toAdd) {
-            jobs.appendChild(node);
-          }
+      const dupName = cloneNode(watchName);
+      getNameFromId(watcheeId).then((name) => {
+        dupName.innerText = name;
+      });
+      dupName.addEventListener("click", () => {
+        showProfile(watcheeId);
+      });
+      watchList.appendChild(dupName);
+    }
+    // Jobs list
+    const jobs = pp.querySelector("#profile-jobs");
+    if (user.jobs.length === 0) {
+      jobs.innerText = "No jobs.";
+    } else {
+      jobs.innerText = "Jobs: loading...";
+      // Most recent first
+      user.jobs.sort((a, b) => {
+        return new Date(b.createdAt) - new Date(a.createdAt);
+      });
+      const toAdd = [];
+      let prom = createJobElement(user.jobs[0], true);
+      for (let i = 1; i < user.jobs.length; i++) {
+        prom = prom.then((jobDom) => {
           toAdd.push(jobDom);
-          jobs.appendChild(jobDom);
+          return createJobElement(user.jobs[i], true);
         });
       }
-    })
-    .catch((error) => {
-      console.log("TODO showProfile getUserDetails ERROR! ", error);
-    });
-  show("page-profile");
-};
-
-// Populate the update profile screen with user info
-const updateProfile = () => {
-  getUserDetails(getUserId())
-    .then((user) => {
+      prom.then((jobDom) => {
+        clearChildren(jobs);
+        jobs.innerText = "Jobs:";
+        for (const node of toAdd) {
+          jobs.appendChild(node);
+        }
+        toAdd.push(jobDom);
+        jobs.appendChild(jobDom);
+      });
+    }
+    // Prefill profile update fields
+    if (userId === getUserId()) {
       const pu = document.getElementById("page-profile-update");
       pu.querySelector("#update-email").value = user.email;
       pu.querySelector("#update-name").value = user.name;
-    })
-    .catch((error) => {
-      console.log("TODO showProfile getUserDetails ERROR! ", error);
-    });
+    }
+  });
+  show("page-profile");
 };
 
 // Hides all pages
@@ -500,7 +492,6 @@ const doUserLoginActions = () => {
   hide("section-logged-out");
   hide("error-popup");
   populateFeed(0);
-  updateProfile();
   // Check browser supports notifications
   if ("Notification" in window) {
     Notification.requestPermission().then((perm) => {
@@ -692,39 +683,37 @@ document.getElementById("update-profile").addEventListener("click", () => {
   if (passwordDom.value.length > 0) {
     payload.password = passwordDom.value;
   }
-  getUserDetails(getUserId())
-    .then((user) => {
-      const updateEmail = document.getElementById("update-email");
-      const updateName = document.getElementById("update-name");
-      if (updateEmail.value !== user.email) {
-        payload.email = updateEmail.value;
-      }
-      if (updateName.value !== user.name) {
-        payload.name = updateName.value;
-      }
-      const upload = (payload) => {
-        apiCall("user", "PUT", payload, () => {
-          hideAll();
-          showProfile(getUserId());
+  // Error if update to same email, so exclude from payload if same
+  getUserDetails(getUserId()).then((user) => {
+    const updateEmail = document.getElementById("update-email");
+    const updateName = document.getElementById("update-name");
+    if (updateEmail.value !== user.email) {
+      payload.email = updateEmail.value;
+    }
+    if (updateName.value !== user.name) {
+      payload.name = updateName.value;
+    }
+    // Do this function right at the end
+    const upload = (payload) => {
+      apiCall("user", "PUT", payload, () => {
+        hideAll();
+        showProfile(getUserId());
+      });
+    };
+    if (imageDom.files.length > 0) {
+      fileToDataUrl(imageDom.files[0])
+        .then((image) => {
+          payload.image = image;
+          upload(payload);
+        })
+        .catch((error) => {
+          errorShow("Provided profile image is not a png, jpg or jpeg.");
+          imageError = true;
         });
-      };
-      if (imageDom.files.length > 0) {
-        fileToDataUrl(imageDom.files[0])
-          .then((image) => {
-            payload.image = image;
-            upload(payload);
-          })
-          .catch((error) => {
-            errorShow("Provided profile image is not a png, jpg or jpeg.");
-            imageError = true;
-          });
-      } else {
-        upload(payload);
-      }
-    })
-    .catch((error) => {
-      console.log("TODO getUserDetails update profile ERROR! ", error);
-    });
+    } else {
+      upload(payload);
+    }
+  });
 });
 
 // Update profile cancel
