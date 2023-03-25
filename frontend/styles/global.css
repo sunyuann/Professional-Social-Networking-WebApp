@@ -13,7 +13,7 @@ body {
 }
 
 .centered {
-  position: absolute;
+  position: fixed;
   top: 50%;
   left: 50%;
   text-align: center;
@@ -33,6 +33,11 @@ body {
   flex-direction: column;
   align-items: flex-start;
   gap: 10px;
+}
+
+/* Watch via email popup*/
+#modal-watch .modal-footer {
+  justify-content: space-between;
 }
 
 /* Error popup*/
@@ -63,7 +68,7 @@ body {
 }
 .feed-image {
   flex: 1;
-  max-width: 300;
+  width: 300px;
   max-height: 300px;
   height: auto;
 }

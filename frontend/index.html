@@ -146,15 +146,15 @@
         <!-- Feed -->
         <div id="page-job-feed">
           <h4>Job Feed</h4>
+          <button
+            type="button"
+            class="btn btn-primary"
+            data-bs-toggle="modal"
+            data-bs-target="#modal-watch"
+          >
+            Watch more people
+          </button>
           <input type="button" id="feed-refresh" value="Refresh Feed" />
-          <div id="watch-search">
-            <input
-              type="text"
-              id="watch-search-email"
-              placeholder="Email to watch"
-            />
-            <input type="button" id="btn-watch-search" value="Watch" />
-          </div>
           <div id="feed-items">
             <div id="feed-item" class="feed-item hide">
               <img
@@ -211,14 +211,13 @@
                     value="Delete"
                   />
                 </div>
-                <div id="page-job-post-update" class="hide">
+                <div class="page-job-post-update hide">
                   <form id="job-post-update" method="PUT" action="/job">
                     <div class="form-group">
                       <label for="job-post-update-title">Title</label>
                       <input
                         type="text"
-                        class="form-control"
-                        id="job-post-update-title"
+                        class="job-post-update-title form-control"
                         placeholder="Enter a job title"
                       />
                     </div>
@@ -226,9 +225,8 @@
                       <label for="job-post-update-image">Image</label>
                       <input
                         type="file"
-                        class="form-control"
+                        class="job-post-update-image form-control"
                         accept="image/*"
-                        id="job-post-update-image"
                         placeholder="Upload image"
                       />
                     </div>
@@ -236,8 +234,7 @@
                       <label for="job-post-update-start">Start date</label>
                       <input
                         type="date"
-                        class="form-control"
-                        id="job-post-update-start"
+                        class="job-post-update-start form-control"
                       />
                     </div>
                     <div class="form-group">
@@ -246,8 +243,7 @@
                       >
                       <input
                         type="text"
-                        class="form-control"
-                        id="job-post-update-description"
+                        class="job-post-update-description form-control"
                         placeholder="Enter description"
                       />
                     </div>
@@ -386,9 +382,57 @@
             />
           </form>
         </div>
-
-        <!-- Updating & deleting a job -->
       </section>
+
+      <!-- Enter email to watch popup -->
+
+      <div
+        id="modal-watch"
+        class="modal fade"
+        tabindex="-1"
+        aria-labelledby="modal-watch-label"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="modal-watch-label">
+                Enter an email to watch
+              </h1>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <input
+                type="text"
+                id="watch-search-email"
+                class="form-control"
+                placeholder="bob@jane.tmart"
+              />
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Close
+              </button>
+              <button
+                type="button"
+                id="btn-watch-search"
+                class="btn btn-primary"
+              >
+                Watch
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <!-- Error popup -->
       <div id="error-popup" class="centered hide">
