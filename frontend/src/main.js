@@ -600,6 +600,9 @@ document.getElementById("error-close").addEventListener("click", () => {
 document.getElementById("nav-job-feed").addEventListener("click", () => {
   hideAll();
   show("page-job-feed");
+  document.getElementById("nav-job-feed").classList.add("active");
+  document.getElementById("nav-job-post").classList.remove("active");
+  document.getElementById("nav-profile-me").classList.remove("active");
   populateFeed(0, true);
 });
 
@@ -607,11 +610,17 @@ document.getElementById("nav-job-feed").addEventListener("click", () => {
 document.getElementById("nav-job-post").addEventListener("click", () => {
   hideAll();
   show("page-job-post");
+  document.getElementById("nav-job-post").classList.add("active");
+  document.getElementById("nav-job-feed").classList.remove("active");
+  document.getElementById("nav-profile-me").classList.remove("active");
 });
 
 // Navbar Me, show your profile page
 document.getElementById("nav-profile-me").addEventListener("click", () => {
   showProfile(getUserId());
+  document.getElementById("nav-profile-me").classList.add("active");
+  document.getElementById("nav-job-post").classList.remove("active");
+  document.getElementById("nav-job-feed").classList.remove("active");
 });
 
 // Register page, login button
