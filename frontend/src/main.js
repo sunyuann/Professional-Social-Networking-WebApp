@@ -169,27 +169,27 @@ const createJobElement = (jobDetail, editable = false) => {
       // edit button
       if (feedDom.querySelector(".job-edit-button").value === "Edit") {
         feedDom.querySelector(".job-edit-button").value = "Cancel";
-        feedDom.querySelector("#page-job-post-update").classList.remove("hide");
+        feedDom.querySelector(".page-job-post-update").classList.remove("hide");
       } else {
         feedDom.querySelector(".job-edit-button").value = "Edit";
-        feedDom.querySelector("#page-job-post-update").classList.add("hide");
+        feedDom.querySelector(".page-job-post-update").classList.add("hide");
       }
     });
     // update job button
     feedDom
       .querySelector(".update-job-button")
       .addEventListener("click", () => {
-        const title = feedDom.querySelector("#job-post-update-title").value;
+        const title = feedDom.querySelector(".job-post-update-title").value;
         const description = feedDom.querySelector(
-          "#job-post-update-description"
+          ".job-post-update-description"
         ).value;
-        const start = feedDom.querySelector("#job-post-update-start").value;
+        const start = feedDom.querySelector(".job-post-update-start").value;
         // error checking
         if (title === "") {
           errorShow("Please enter a title");
           return;
         } else if (
-          feedDom.querySelector("#job-post-update-image").files.length === 0
+          feedDom.querySelector(".job-post-update-image").files.length === 0
         ) {
           errorShow("Please upload an image");
           return;
@@ -200,7 +200,7 @@ const createJobElement = (jobDetail, editable = false) => {
           return;
         }
         // convert to base64, then create job
-        const image_file = feedDom.querySelector("#job-post-update-image")
+        const image_file = feedDom.querySelector(".job-post-update-image")
           .files[0];
         fileToDataUrl(image_file)
           .then((image) => {
@@ -213,10 +213,10 @@ const createJobElement = (jobDetail, editable = false) => {
               description: description,
             };
             apiCall("job", "PUT", payload, () => {
-              feedDom.querySelector("#job-post-update-title").value = "";
-              feedDom.querySelector("#job-post-update-image").value = "";
-              feedDom.querySelector("#job-post-update-start").value = "";
-              feedDom.querySelector("#job-post-update-description").value = "";
+              feedDom.querySelector(".job-post-update-title").value = "";
+              feedDom.querySelector(".job-post-update-image").value = "";
+              feedDom.querySelector(".job-post-update-start").value = "";
+              feedDom.querySelector(".job-post-update-description").value = "";
             });
             hide("error-popup");
           })
