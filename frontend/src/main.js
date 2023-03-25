@@ -253,7 +253,7 @@ const createJobElement = (jobDetail, editable = false) => {
   });
 };
 
-// Live updates
+// Live updates (and notifications)
 // start is a number, represents the first index of the group of 5 jobs this is responsible of.
 // nodes is a list of nodes assocated with start
 // jobIds is the original list of job ids, to detect job adds/deletes
@@ -271,18 +271,6 @@ const liveUpdate = (start, nodes, jobIds, id = null) => {
   setTimeout(() => {
     if (polls.includes(id)) {
       apiCall("job/feed", "GET", { start: start }, (data) => {
-        console.log(
-          "start ",
-          start,
-          " nodes ",
-          nodes,
-          " jobIds ",
-          jobIds,
-          " data ",
-          data,
-          " id ",
-          id
-        );
         if (polls.includes(id)) {
           // Sort recent jobs first
           data.sort((a, b) => {
@@ -782,7 +770,6 @@ document.getElementById("feed-refresh").addEventListener("click", () => {
 // Scrolling
 const throttledScroll = throttle(() => {
   if (populateDone) {
-    console.log("SCROLL TRIG ", currentFeedIndex);
     populateFeed(currentFeedIndex, false);
   }
 }, 500);
