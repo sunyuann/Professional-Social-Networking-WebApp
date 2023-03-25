@@ -390,7 +390,7 @@ const showProfile = (userId) => {
     pp.querySelector("#profile-userid").innerText = user.id;
     pp.querySelector("#profile-email").innerText = user.email;
     pp.querySelector("#profile-name").innerText = user.name;
-    pp.querySelector("#profile-image").innerText = user.image;
+    pp.querySelector("#profile-image").src = user.image;
     // Edit Button
     const btnEdit = document.getElementById("profile-edit");
     if (userId === getUserId()) {
