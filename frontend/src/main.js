@@ -271,6 +271,18 @@ const liveUpdate = (start, nodes, jobIds, id = null) => {
   setTimeout(() => {
     if (polls.includes(id)) {
       apiCall("job/feed", "GET", { start: start }, (data) => {
+        console.log(
+          "start ",
+          start,
+          " nodes ",
+          nodes,
+          " jobIds ",
+          jobIds,
+          " data ",
+          data,
+          " id ",
+          id
+        );
         if (polls.includes(id)) {
           // Sort recent jobs first
           data.sort((a, b) => {
@@ -282,7 +294,9 @@ const liveUpdate = (start, nodes, jobIds, id = null) => {
           if (data.length === nodes.length) {
             for (const i in nodes) {
               if (data[i].id === jobIds[i]) {
-                updateJob(nodes[i], data[i]);
+                if (nodes[i] !== null) {
+                  updateJob(nodes[i], data[i]);
+                }
               } else if (start === 0) {
                 // Only trigger for jobs 0-4
                 die = true;
@@ -296,7 +310,8 @@ const liveUpdate = (start, nodes, jobIds, id = null) => {
                 break;
               }
             }
-          } else {
+          } else if (start === 0) {
+            // Only trigger for jobs 0-4
             // Feed changed, stop Live Updates
             die = true;
             if (data.length > nodes.length) {
@@ -304,7 +319,18 @@ const liveUpdate = (start, nodes, jobIds, id = null) => {
             }
           }
           if (die) {
-            polls.length = 0;
+            if (start === 0) {
+              // No Live Updates, but still need notifications
+              polls = [id];
+              nodes = [];
+              jobIds = [];
+              for (const d of data) {
+                jobIds.push(d.id);
+                nodes.push(null);
+              }
+            } else {
+              polls.length = 0;
+            }
             console.log(
               `Note to marker: Live Updates stopped because a job was ${
                 itsAdd ? "added to" : "deleted from"
@@ -374,7 +400,7 @@ const populateFeed = (start, clear = true) => {
         }
         populateDone = true;
       });
-    } else {
+    } else if (start === 0) {
       // This is for notifications
       liveUpdate(0, [], []);
     }
@@ -756,6 +782,7 @@ document.getElementById("feed-refresh").addEventListener("click", () => {
 // Scrolling
 const throttledScroll = throttle(() => {
   if (populateDone) {
+    console.log("SCROLL TRIG ", currentFeedIndex);
     populateFeed(currentFeedIndex, false);
   }
 }, 500);
