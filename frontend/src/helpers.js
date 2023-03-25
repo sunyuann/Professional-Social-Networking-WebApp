@@ -55,18 +55,18 @@ export const apiCall = (path, method, body, success) => {
     options.headers.Authorization = `Bearer ${localStorage.getItem("token")}`;
   }
 
-  fetch(`http://localhost:${BACKEND_PORT}/` + path, options).then(
+  return fetch(`http://localhost:${BACKEND_PORT}/` + path, options).then(
     (response) => {
       response.json().then((data) => {
         if (data.error) {
           if (getUserId()) {
             errorShow(data.error);
           } else {
-            console.log("API call, but you logged out before it finished")
+            console.log("API call, but you logged out before it finished");
           }
         } else {
           if (success) {
-            success(data);
+            return Promise.resolve(success(data));
           }
         }
       });
@@ -105,6 +105,21 @@ export const getHoursMinutesSince = (datetimestr) => {
   const hours = Math.floor(minutes / 60);
   minutes = minutes - hours * 60;
   return [hours, minutes];
+};
+
+// Returns a promise with the name
+var nameDB = {};
+export const getNameFromId = (id) => {
+  return new Promise((resolve, reject) => {
+    if (nameDB[id]) {
+      resolve(nameDB[id]);
+    } else {
+      getUserDetails(id).then((data) => {
+        nameDB[id] = data.name;
+        resolve(data.name);
+      });
+    }
+  });
 };
 
 // Returns GET /user dictionary response from server
