@@ -64,18 +64,13 @@ body {
 .feed-item {
   display: flex;
   border: 1px black solid;
+  gap: 10px;
   padding: 10px;
 }
 .feed-image {
   flex: 1;
   width: 300px;
   max-height: 300px;
-  height: auto;
-}
-#profile-image {
-  flex: 1;
-  width: 200px;
-  max-height: 200px;
   height: auto;
 }
 .feed-text {
@@ -90,12 +85,26 @@ body {
 }
 
 /* Profile page */
+#profile-details {
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+}
+#profile-image {
+  flex: 1;
+  max-width: 200px;
+  height: auto;
+}
 
 /* Update profile page */
 
 /* Adding a job */
 .datetime {
   max-width: 150px;
+}
+
+.btn-primary {
+  margin: 10px 0px;
 }
 
 /* At the bottom so it overrides the above */

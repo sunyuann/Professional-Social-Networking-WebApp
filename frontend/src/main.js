@@ -488,10 +488,11 @@ const showProfile = (userId) => {
     }
     // Jobs list
     const jobs = pp.querySelector("#profile-jobs");
+    const jobsText = pp.querySelector("#profile-jobs-text");
     if (user.jobs.length === 0) {
-      jobs.innerText = "No jobs.";
+      jobsText.innerText = "No jobs.";
     } else {
-      jobs.innerText = "Jobs: loading...";
+      jobsText.innerText = "Jobs: loading...";
       // Most recent first
       user.jobs.sort((a, b) => {
         return new Date(b.createdAt) - new Date(a.createdAt);
@@ -506,7 +507,7 @@ const showProfile = (userId) => {
       }
       prom.then((jobDom) => {
         clearChildren(jobs);
-        jobs.innerText = "Jobs:";
+        jobsText.innerText = "Jobs:";
         for (const node of toAdd) {
           jobs.appendChild(node);
         }
