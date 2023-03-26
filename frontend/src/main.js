@@ -162,13 +162,24 @@ document.getElementById("login-register").addEventListener("click", () => {
   hide("page-login");
 });
 
+// nav logout button
+document.getElementById("nav-logout").addEventListener("click", () => {
+  show("logout-popup");
+});
+
 // logout button
 document.getElementById("logout").addEventListener("click", () => {
   clearPolls();
   show("section-logged-out");
   hide("section-logged-in");
+  hide("logout-popup");
   localStorage.removeItem("token");
   localStorage.removeItem("userId");
+});
+
+// logout close button
+document.getElementById("logout-close").addEventListener("click", () => {
+  hide("logout-popup");
 });
 
 // creating job

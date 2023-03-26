@@ -53,6 +53,19 @@ body {
 #error-content {
   padding: 10px;
 }
+/* Logout popup*/
+#logout-popup {
+  position: fixed;
+  left: 45%;
+  border: 5px #0d6efd solid;
+  border-radius: 10px;
+  width: fit-content;
+  padding: 10px;
+  background-color: white;
+}
+#logout-content {
+  padding: 10px;
+}
 
 /* Feed */
 .feed-items {

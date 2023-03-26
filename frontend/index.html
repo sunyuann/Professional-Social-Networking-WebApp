@@ -162,10 +162,17 @@
           >
             Me
           </li>
-          <li class="nav-item nav-link" id="logout" aria-label="Logout">
+          <li class="nav-item nav-link" id="nav-logout" aria-label="Logout">
             Logout
           </li>
         </nav>
+
+        <!-- Logout confirmation popup -->
+        <div id="logout-popup" class="centered hide">
+          <div id="logout-content">Are you sure you want to log out?</div>
+          <button id="logout" class="btn btn-primary">Log out</button>
+          <button id="logout-close" class="btn btn-secondary">Cancel</button>
+        </div>
 
         <!-- Feed -->
         <div id="page-job-feed">
@@ -487,7 +494,7 @@
       <!-- Error popup -->
       <div id="error-popup" class="centered hide">
         <div id="error-content">Dummy text</div>
-        <button id="error-close">Close</button>
+        <button id="error-close" class="btn btn-primary">Close</button>
       </div>
     </main>
     <footer>
