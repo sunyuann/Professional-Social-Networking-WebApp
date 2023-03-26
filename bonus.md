@@ -1,2 +1,3 @@
 - Live update works for all feed items, not just first 5
+- Sort option for Profile jobs list.
 - Default profile picture is Hayden.

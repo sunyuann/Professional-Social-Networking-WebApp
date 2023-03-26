@@ -96,16 +96,29 @@ export const showProfile = (userId) => {
       watchList.appendChild(dupName);
     }
     // Jobs list
+    // Add Sort by event listener
+    // Profile jobs sort order
+    pp.querySelector("#profile-job-sort").onchange = (event) => {
+      console.log("CHANGE ", event);
+      localStorage.setItem("sort", event.target.value);
+      showProfile(userId);
+    };
     const jobs = pp.querySelector("#profile-jobs");
     const jobsText = pp.querySelector("#profile-jobs-text");
     if (user.jobs.length === 0) {
       jobsText.innerText = "No jobs.";
     } else {
       jobsText.innerText = "Jobs: loading...";
-      // Most recent first
-      user.jobs.sort((a, b) => {
-        return new Date(b.createdAt) - new Date(a.createdAt);
-      });
+      // Sort jobs
+      if (localStorage.getItem("sort") === "old") {
+        user.jobs.sort((a, b) => {
+          return new Date(a.createdAt) - new Date(b.createdAt);
+        });
+      } else {
+        user.jobs.sort((a, b) => {
+          return new Date(b.createdAt) - new Date(a.createdAt);
+        });
+      }
       const toAdd = [];
       let prom = createJobElement(user.jobs[0], true);
       for (let i = 1; i < user.jobs.length; i++) {
