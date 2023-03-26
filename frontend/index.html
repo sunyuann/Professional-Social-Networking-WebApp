@@ -18,6 +18,12 @@
       media="screen"
       href="styles/global.css"
     />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      media="screen"
+      href="styles/media-maxwidth.css"
+    />
   </head>
   <body>
     <!-- This is an example app structure, you can modify this as much as you choose -->
@@ -135,17 +141,41 @@
       <section id="section-logged-in" class="hide">
         <!-- Navbar section -->
         <nav class="nav nav-tabs">
-          <!-- <li class="nav-item" id="nav-register">Register</li>
-          <li class="nav-item" id="nav-login">Login</li> -->
-          <li class="nav-item nav-link active" id="nav-job-feed">Job Feed</li>
-          <li class="nav-item nav-link" id="nav-job-post">Create Job</li>
-          <li class="nav-item nav-link" id="nav-profile-me">Me</li>
-          <li class="nav-item nav-link" id="logout">Logout</li>
+          <li
+            class="nav-item nav-link active"
+            id="nav-job-feed"
+            aria-label="Navigate to the Job Feed"
+          >
+            Job Feed
+          </li>
+          <li
+            class="nav-item nav-link"
+            id="nav-job-post"
+            aria-label="Navigate to creating a job"
+          >
+            Create Job
+          </li>
+          <li
+            class="nav-item nav-link"
+            id="nav-profile-me"
+            aria-label="Navigate to your profile page"
+          >
+            Me
+          </li>
+          <li class="nav-item nav-link" id="logout" aria-label="Logout">
+            Logout
+          </li>
         </nav>
 
         <!-- Feed -->
         <div id="page-job-feed">
           <h4>Job Feed</h4>
+          <input
+            type="button"
+            id="feed-refresh"
+            class="btn btn-primary"
+            value="Refresh Feed"
+          />
           <button
             type="button"
             class="btn btn-primary"
@@ -154,14 +184,9 @@
           >
             Watch more people
           </button>
-          <input type="button" id="feed-refresh" value="Refresh Feed" />
-          <div id="feed-items">
+          <div id="feed-items" class="feed-items">
             <div id="feed-item" class="feed-item hide">
-              <img
-                class="feed-image"
-                src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg=="
-                alt="Dummy feed image"
-              />
+              <img class="feed-image" src="" alt="Dummy feed image" />
               <div class="feed-text">
                 <div class="feed-title">FEED TITLE</div>
                 <div class="feed-creator clickable">Dummy McDummy</div>
@@ -212,17 +237,17 @@
                   />
                 </div>
                 <div class="page-job-post-update hide">
-                  <form id="job-post-update" method="PUT" action="/job">
+                  <form class="job-post-update" method="PUT" action="/job">
                     <div class="form-group">
-                      <label for="job-post-update-title">Title</label>
+                      <label class="lbl-job-post-update-title">Title</label>
                       <input
                         type="text"
                         class="job-post-update-title form-control"
-                        placeholder="Enter a job title"
+                        placeholder="Update job title"
                       />
                     </div>
                     <div class="form-group">
-                      <label for="job-post-update-image">Image</label>
+                      <label class="lbl-job-post-update-image">Image</label>
                       <input
                         type="file"
                         class="job-post-update-image form-control"
@@ -231,15 +256,24 @@
                       />
                     </div>
                     <div class="form-group">
-                      <label for="job-post-update-start">Start date</label>
+                      <label class="lbl-job-post-update-start-date"
+                        >Start date</label
+                      >
                       <input
                         type="date"
-                        class="job-post-update-start form-control"
+                        class="job-post-update-start-date form-control datetime"
+                      />
+                      <label class="lbl-job-post-update-start-time"
+                        >Start time</label
+                      >
+                      <input
+                        type="time"
+                        class="job-post-update-start-time form-control datetime"
                       />
                     </div>
                     <div class="form-group">
-                      <label for="job-post-update-description"
-                        >Description</label
+                      <label class="lbl-job-post-update-description"
+                        >Update description</label
                       >
                       <input
                         type="text"
@@ -261,27 +295,33 @@
 
         <!-- Profile page -->
         <div id="page-profile" class="hide">
-          <img
-            id="profile-image"
-            src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg=="
-            alt="Dummy profile image"
-          />
-          <div id="profile-name">Dummy Profile Name</div>
-          <div id="profile-userid">4561</div>
-          <div id="profile-email">Dummy Profile Email</div>
-          <input
-            type="button"
-            id="profile-edit"
-            class="btn btn-primary hide"
-            value="Edit your profile"
-          />
-          <input type="button" id="profile-watch" class="hide" value="Watch" />
-          <div id="profile-watched-list">
-            <span id="profile-watched-start">Watched by 500 users:</span>
-            <span class="profile-watched-name clickable hide">Tara</span>
-            <span class="profile-watched-sep hide">, </span>
+          <div id="profile-details">
+            <img id="profile-image" src="" alt="Dummy profile image" />
+            <div id="profile-text">
+              <div id="profile-name">Dummy Profile Name</div>
+              <div id="profile-userid">4561</div>
+              <div id="profile-email">Dummy Profile Email</div>
+              <input
+                type="button"
+                id="profile-edit"
+                class="btn btn-primary hide"
+                value="Edit your profile"
+              />
+              <input
+                type="button"
+                id="profile-watch"
+                class="btn btn-primary hide"
+                value="Watch"
+              />
+              <div id="profile-watched-list">
+                <span id="profile-watched-start">Watched by 500 users:</span>
+                <span class="profile-watched-name clickable hide"></span>
+                <span class="profile-watched-sep hide">, </span>
+              </div>
+            </div>
           </div>
-          <div id="profile-jobs">Jobs:</div>
+          <h4 id="profile-jobs-text">Jobs:</h4>
+          <div id="profile-jobs" class="feed-items"></div>
         </div>
 
         <!-- Update profile page -->
@@ -362,8 +402,19 @@
               />
             </div>
             <div class="form-group">
-              <label for="job-post-start">Start date</label>
-              <input type="date" class="form-control" id="job-post-start" />
+              <label for="job-post-start-date">Start date</label>
+              <input
+                type="date"
+                class="form-control datetime"
+                id="job-post-start-date"
+              />
+              <label for="job-post-start-time">Start time</label>
+              <input
+                type="time"
+                class="form-control datetime"
+                id="job-post-start-time"
+                value="09:00"
+              />
             </div>
             <div class="form-group">
               <label for="job-post-description">Description</label>
@@ -385,7 +436,6 @@
       </section>
 
       <!-- Enter email to watch popup -->
-
       <div
         id="modal-watch"
         class="modal fade"

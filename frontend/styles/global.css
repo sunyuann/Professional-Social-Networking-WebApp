@@ -2,7 +2,7 @@
 
 html,
 body {
-  margin: 20px;
+  margin: 10px;
   padding: 0;
   /*height: 100%;*/ /*This prevents end of page detection*/
   font-family: Arial;
@@ -55,31 +55,28 @@ body {
 }
 
 /* Feed */
-#feed-items {
+.feed-items {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  flex-direction: row;
+  flex-wrap: wrap;
   gap: 10px;
+  margin-right: 20px;
 }
 .feed-item {
   display: flex;
   border: 1px black solid;
+  gap: 10px;
   padding: 10px;
+  width: 100%;
+  max-width: 550px;
 }
 .feed-image {
-  flex: 1;
   width: 300px;
-  max-height: 300px;
   height: auto;
-}
-#profile-image {
-  flex: 1;
-  width: 200px;
-  max-height: 200px;
-  height: auto;
+  object-fit: contain;
 }
 .feed-text {
-  flex: 3;
+  width: 300px;
 }
 .clickable {
   color: #1567c0;
@@ -90,12 +87,31 @@ body {
 }
 
 /* Profile page */
+#profile-details {
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+}
+#profile-image {
+  width: 300px;
+  height: auto;
+  object-fit: contain;
+}
 
 /* Update profile page */
 
 /* Adding a job */
+.datetime {
+  max-width: 150px;
+}
 
-/* Updating & deleting a job */
+.btn-primary {
+  margin: 10px 0px;
+}
+
+h4 {
+  margin-top: 10px;
+}
 
 /* At the bottom so it overrides the above */
 .hide {

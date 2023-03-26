@@ -1,0 +1,11 @@
+@media (max-width: 590px) {
+  .feed-image {
+    max-width: 150px;
+  }
+}
+
+@media (max-width: 450px) {
+  .feed-image {
+    max-width: 50px;
+  }
+}
