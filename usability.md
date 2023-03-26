@@ -12,3 +12,4 @@
 - Confirm pop up for logout action
 - When pressing enter in an input, goes to next input.
 - When pressing enter on last input, submits.
+- Error popup is always on top using z-index.
