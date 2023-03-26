@@ -141,12 +141,30 @@
       <section id="section-logged-in" class="hide">
         <!-- Navbar section -->
         <nav class="nav nav-tabs">
-          <!-- <li class="nav-item" id="nav-register">Register</li>
-          <li class="nav-item" id="nav-login">Login</li> -->
-          <li class="nav-item nav-link active" id="nav-job-feed">Job Feed</li>
-          <li class="nav-item nav-link" id="nav-job-post">Create Job</li>
-          <li class="nav-item nav-link" id="nav-profile-me">Me</li>
-          <li class="nav-item nav-link" id="logout">Logout</li>
+          <li
+            class="nav-item nav-link active"
+            id="nav-job-feed"
+            aria-label="Navigate to the Job Feed"
+          >
+            Job Feed
+          </li>
+          <li
+            class="nav-item nav-link"
+            id="nav-job-post"
+            aria-label="Navigate to creating a job"
+          >
+            Create Job
+          </li>
+          <li
+            class="nav-item nav-link"
+            id="nav-profile-me"
+            aria-label="Navigate to your profile page"
+          >
+            Me
+          </li>
+          <li class="nav-item nav-link" id="logout" aria-label="Logout">
+            Logout
+          </li>
         </nav>
 
         <!-- Feed -->
@@ -418,7 +436,6 @@
       </section>
 
       <!-- Enter email to watch popup -->
-
       <div
         id="modal-watch"
         class="modal fade"

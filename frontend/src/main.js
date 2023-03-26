@@ -225,7 +225,6 @@ const createJobElement = (jobDetail, editable = false) => {
           .files[0];
         fileToDataUrl(image_file)
           .then((image) => {
-            console.log(image);
             const payload = {
               id: jobDetail.id,
               title: title,
@@ -249,7 +248,7 @@ const createJobElement = (jobDetail, editable = false) => {
             hide("error-popup");
           })
           .catch((error) => {
-            console.log("Image not found", error);
+            errorShow("Provided profile image is not a png, jpg or jpeg.");
           });
       });
     // delete job button
@@ -261,7 +260,6 @@ const createJobElement = (jobDetail, editable = false) => {
         };
         apiCall("job", "DELETE", payload, () => {
           feedDom.classList.add("hide");
-          console.log("SUCCESS");
           hide("error-popup");
         });
       });
@@ -419,7 +417,6 @@ const populateFeed = (start, clear = true) => {
       // This is for notifications
       liveUpdate(0, [], []);
     }
-    console.log("data", data);
   });
 };
 
@@ -617,18 +614,6 @@ document.getElementById("error-close").addEventListener("click", () => {
   hide("error-popup");
 });
 
-// Navbar register, show register page
-// document.getElementById("nav-register").addEventListener("click", () => {
-//   show("page-register");
-//   hide("page-login");
-// });
-
-// Navbar login, show login page
-// document.getElementById("nav-login").addEventListener("click", () => {
-//   show("page-login");
-//   hide("page-register");
-// });
-
 // Navbar Job Feed, show job feed page
 document.getElementById("nav-job-feed").addEventListener("click", () => {
   hideAll();
@@ -711,7 +696,6 @@ document.getElementById("create-job").addEventListener("click", () => {
         start: new Date(`${startDate}T${startTime}`).toISOString(),
         description: description,
       };
-      console.log(new Date(`${startDate}T${startTime}`).toISOString());
       apiCall("job", "POST", payload, () => {
         document.getElementById("job-post-title").value = "";
         document.getElementById("job-post-image").value = "";
@@ -841,7 +825,5 @@ var currentPollId = 0;
 var notificationGranted = false;
 if (localStorage.getItem("token") && getUserId()) {
   doUserLoginActions();
-  console.log(localStorage.getItem("token"));
+  console.log("Token: ", localStorage.getItem("token"));
 }
-const curr_date = new Date();
-console.log(new Date().toISOString());
