@@ -177,6 +177,16 @@ const createJobElement = (jobDetail, editable = false) => {
         feedDom.querySelector(".page-job-post-update").classList.add("hide");
       }
     });
+    // Assign label for inputs
+    const toFor = ["title", "image", "start-date", "start-time", "description"];
+    for (const t of toFor) {
+      feedDom
+        .querySelector(`.lbl-job-post-update-${t}`)
+        .setAttribute("for", `job-update-${t}-${jobDetail.id}`);
+      feedDom
+        .querySelector(`.job-post-update-${t}`)
+        .setAttribute("id", `job-update-${t}-${jobDetail.id}`);
+    }
     // update job button
     feedDom
       .querySelector(".update-job-button")
@@ -185,7 +195,12 @@ const createJobElement = (jobDetail, editable = false) => {
         const description = feedDom.querySelector(
           ".job-post-update-description"
         ).value;
-        const start = feedDom.querySelector(".job-post-update-start").value;
+        const startDate = feedDom.querySelector(
+          ".job-post-update-start-date"
+        ).value;
+        const startTime = feedDom.querySelector(
+          ".job-post-update-start-time"
+        ).value;
         // error checking
         if (title === "") {
           errorShow("Please enter a title");
@@ -195,8 +210,10 @@ const createJobElement = (jobDetail, editable = false) => {
         ) {
           errorShow("Please upload an image");
           return;
-        } else if (start === "") {
-          errorShow("Please select a date");
+        } else if (startDate === "") {
+          errorShow("Please enter a date");
+        } else if (startTime === "") {
+          errorShow("Please enter a time");
         } else if (description === "") {
           errorShow("Please enter a description");
           return;
@@ -211,14 +228,21 @@ const createJobElement = (jobDetail, editable = false) => {
               id: jobDetail.id,
               title: title,
               image: image,
-              start: new Date(start).toISOString(),
+              start: new Date(`${startDate}T${startTime}`).toISOString(),
               description: description,
             };
             apiCall("job", "PUT", payload, () => {
               feedDom.querySelector(".job-post-update-title").value = "";
               feedDom.querySelector(".job-post-update-image").value = "";
-              feedDom.querySelector(".job-post-update-start").value = "";
+              feedDom.querySelector(".job-post-update-start-date").value = "";
+              feedDom.querySelector(".job-post-update-start-time").value = "";
               feedDom.querySelector(".job-post-update-description").value = "";
+              // Update info on page
+              feedDom.querySelector(".feed-image").src = payload.image;
+              feedDom.querySelector(".feed-title").innerText = payload.title;
+              feedDom.querySelector(".feed-start").innerText = payload.start;
+              feedDom.querySelector(".feed-description").innerText =
+                payload.description;
             });
             hide("error-popup");
           })
@@ -655,7 +679,8 @@ document.getElementById("logout").addEventListener("click", () => {
 document.getElementById("create-job").addEventListener("click", () => {
   const title = document.getElementById("job-post-title").value;
   const description = document.getElementById("job-post-description").value;
-  const start = document.getElementById("job-post-start").value;
+  const startDate = document.getElementById("job-post-start-date").value;
+  const startTime = document.getElementById("job-post-start-time").value;
   // error checking
   if (title === "") {
     errorShow("Please enter a title");
@@ -663,8 +688,10 @@ document.getElementById("create-job").addEventListener("click", () => {
   } else if (document.querySelector("#job-post-image").files.length === 0) {
     errorShow("Please upload an image");
     return;
-  } else if (start === "") {
+  } else if (startDate === "") {
     errorShow("Please select a date");
+  } else if (startTime === "") {
+    errorShow("Please select a time");
   } else if (description === "") {
     errorShow("Please enter a description");
     return;
@@ -677,13 +704,15 @@ document.getElementById("create-job").addEventListener("click", () => {
       const payload = {
         title: title,
         image: image,
-        start: new Date(start).toISOString(),
+        start: new Date(`${startDate}T${startTime}`).toISOString(),
         description: description,
       };
+      console.log(new Date(`${startDate}T${startTime}`).toISOString());
       apiCall("job", "POST", payload, () => {
         document.getElementById("job-post-title").value = "";
         document.getElementById("job-post-image").value = "";
-        document.getElementById("job-post-start").value = "";
+        document.getElementById("job-post-start-date").value = "";
+        document.getElementById("job-post-start-time").value = "09:00";
         document.getElementById("job-post-description").value = "";
       });
       hide("error-popup");

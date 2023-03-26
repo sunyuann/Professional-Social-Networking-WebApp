@@ -208,17 +208,17 @@
                   />
                 </div>
                 <div class="page-job-post-update hide">
-                  <form id="job-post-update" method="PUT" action="/job">
+                  <form class="job-post-update" method="PUT" action="/job">
                     <div class="form-group">
-                      <label for="job-post-update-title">Title</label>
+                      <label class="lbl-job-post-update-title">Title</label>
                       <input
                         type="text"
                         class="job-post-update-title form-control"
-                        placeholder="Enter a job title"
+                        placeholder="Update job title"
                       />
                     </div>
                     <div class="form-group">
-                      <label for="job-post-update-image">Image</label>
+                      <label class="lbl-job-post-update-image">Image</label>
                       <input
                         type="file"
                         class="job-post-update-image form-control"
@@ -227,15 +227,24 @@
                       />
                     </div>
                     <div class="form-group">
-                      <label for="job-post-update-start">Start date</label>
+                      <label class="lbl-job-post-update-start-date"
+                        >Start date</label
+                      >
                       <input
                         type="date"
-                        class="job-post-update-start form-control"
+                        class="job-post-update-start-date form-control datetime"
+                      />
+                      <label class="lbl-job-post-update-start-time"
+                        >Start time</label
+                      >
+                      <input
+                        type="time"
+                        class="job-post-update-start-time form-control datetime"
                       />
                     </div>
                     <div class="form-group">
-                      <label for="job-post-update-description"
-                        >Description</label
+                      <label class="lbl-job-post-update-description"
+                        >Update description</label
                       >
                       <input
                         type="text"
@@ -354,8 +363,19 @@
               />
             </div>
             <div class="form-group">
-              <label for="job-post-start">Start date</label>
-              <input type="date" class="form-control" id="job-post-start" />
+              <label for="job-post-start-date">Start date</label>
+              <input
+                type="date"
+                class="form-control datetime"
+                id="job-post-start-date"
+              />
+              <label for="job-post-start-time">Start time</label>
+              <input
+                type="time"
+                class="form-control datetime"
+                id="job-post-start-time"
+                value="09:00"
+              />
             </div>
             <div class="form-group">
               <label for="job-post-description">Description</label>

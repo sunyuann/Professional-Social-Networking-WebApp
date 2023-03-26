@@ -94,8 +94,9 @@ body {
 /* Update profile page */
 
 /* Adding a job */
-
-/* Updating & deleting a job */
+.datetime {
+  max-width: 150px;
+}
 
 /* At the bottom so it overrides the above */
 .hide {
