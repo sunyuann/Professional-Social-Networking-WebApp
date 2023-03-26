@@ -116,7 +116,7 @@ document.getElementById("register-register").addEventListener("click", () => {
     name: document.getElementById("register-name").value,
   };
   apiCall("auth/register", "POST", payload, (data) => {
-    setToken(data.token, userId);
+    setToken(data.token, data.userId);
   });
   //document.getElementById("register-form").submit();
 });
