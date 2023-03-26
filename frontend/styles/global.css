@@ -78,6 +78,11 @@ body {
 .feed-text {
   width: 300px;
 }
+.feed-description {
+  word-wrap: break-word;
+  max-height: 300px;
+  overflow: auto;
+}
 .clickable {
   color: #1567c0;
 }
@@ -111,6 +116,10 @@ body {
 
 h4 {
   margin-top: 10px;
+}
+
+.bold {
+  font-weight: bold;
 }
 
 /* At the bottom so it overrides the above */
