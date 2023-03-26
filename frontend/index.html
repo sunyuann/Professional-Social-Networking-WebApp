@@ -18,6 +18,12 @@
       media="screen"
       href="styles/global.css"
     />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      media="screen"
+      href="styles/media-maxwidth.css"
+    />
   </head>
   <body>
     <!-- This is an example app structure, you can modify this as much as you choose -->
@@ -146,6 +152,12 @@
         <!-- Feed -->
         <div id="page-job-feed">
           <h4>Job Feed</h4>
+          <input
+            type="button"
+            id="feed-refresh"
+            class="btn btn-primary"
+            value="Refresh Feed"
+          />
           <button
             type="button"
             class="btn btn-primary"
@@ -154,8 +166,7 @@
           >
             Watch more people
           </button>
-          <input type="button" id="feed-refresh" value="Refresh Feed" />
-          <div id="feed-items">
+          <div id="feed-items" class="feed-items">
             <div id="feed-item" class="feed-item hide">
               <img class="feed-image" src="" alt="Dummy feed image" />
               <div class="feed-text">
@@ -292,7 +303,7 @@
             </div>
           </div>
           <h4 id="profile-jobs-text">Jobs:</h4>
-          <div id="profile-jobs"></div>
+          <div id="profile-jobs" class="feed-items"></div>
         </div>
 
         <!-- Update profile page -->
