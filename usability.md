@@ -9,3 +9,5 @@
 - Job description has scroll bar if it's too long.
 - Comments have scroll bar if it's too long.
 - Confirm pop up for logout action
+- When pressing enter in an input, goes to next input.
+- When pressing enter on last input, submits.

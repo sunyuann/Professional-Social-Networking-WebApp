@@ -74,6 +74,32 @@ const setToken = (token, userId) => {
 // Add .addEventListener here //
 ////////////////////////////////
 
+// Login page email input, pressing enter
+document.getElementById("login-email").addEventListener("keypress", (event) => {
+  if (event.key === "Enter") {
+    document.getElementById("login-password").focus();
+  }
+});
+
+// Login page password input, pressing enter
+document
+  .getElementById("login-password")
+  .addEventListener("keypress", (event) => {
+    if (event.key === "Enter") {
+      document.getElementById("login-login").click();
+    }
+  });
+
+// Login page, toggle show/hide passwords
+document.getElementById("login-show-password").addEventListener("click", () => {
+  var login_password = document.getElementById("login-password");
+  if (login_password.type === "password") {
+    login_password.type = "text";
+  } else {
+    login_password.type = "password";
+  }
+});
+
 // Login page, login button
 document.getElementById("login-login").addEventListener("click", () => {
   // login
@@ -86,15 +112,41 @@ document.getElementById("login-login").addEventListener("click", () => {
   });
 });
 
-// Login page, toggle show/hide passwords (optional??)
-document.getElementById("login-show-password").addEventListener("click", () => {
-  var login_password = document.getElementById("login-password");
-  if (login_password.type === "password") {
-    login_password.type = "text";
-  } else {
-    login_password.type = "password";
-  }
-});
+// Register page name input, pressing enter
+document
+  .getElementById("register-name")
+  .addEventListener("keypress", (event) => {
+    if (event.key === "Enter") {
+      document.getElementById("register-email").focus();
+    }
+  });
+
+// Register page email input, pressing enter
+document
+  .getElementById("register-email")
+  .addEventListener("keypress", (event) => {
+    if (event.key === "Enter") {
+      document.getElementById("register-password").focus();
+    }
+  });
+
+// Register page password input, pressing enter
+document
+  .getElementById("register-password")
+  .addEventListener("keypress", (event) => {
+    if (event.key === "Enter") {
+      document.getElementById("register-password-confirm").focus();
+    }
+  });
+
+// Register page password confirm input, pressing enter
+document
+  .getElementById("register-password-confirm")
+  .addEventListener("keypress", (event) => {
+    if (event.key === "Enter") {
+      document.getElementById("register-register").click();
+    }
+  });
 
 // Register page, register button
 document.getElementById("register-register").addEventListener("click", () => {
@@ -285,6 +337,15 @@ document
   .addEventListener("click", () => {
     hideAll();
     showProfile(getUserId());
+  });
+
+// Watch email input
+document
+  .getElementById("watch-search-email")
+  .addEventListener("keypress", (event) => {
+    if (event.key === "Enter") {
+      document.getElementById("btn-watch-search").click();
+    }
   });
 
 // Watch email button on feed page

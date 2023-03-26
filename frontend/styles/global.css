@@ -49,6 +49,7 @@ body {
   width: fit-content;
   padding: 10px;
   background-color: white;
+  z-index: 9999;
 }
 #error-content {
   padding: 10px;
