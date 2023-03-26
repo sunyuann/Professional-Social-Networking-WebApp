@@ -6,3 +6,6 @@
 - Images get smaller when screen width smaller.
 - Navigation tabs have aria-label.
 - Date and time inputs are date and time pickers instead of text.
+- Job description has scroll bar if it's too long.
+- Comments have scroll bar if it's too long.
+- Confirm pop up for logout action

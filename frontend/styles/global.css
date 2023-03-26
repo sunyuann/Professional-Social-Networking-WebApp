@@ -81,7 +81,7 @@ body {
   gap: 10px;
   padding: 10px;
   width: 100%;
-  max-width: 550px;
+  max-width: 600px;
 }
 .feed-image {
   width: 300px;
@@ -89,12 +89,18 @@ body {
   object-fit: contain;
 }
 .feed-text {
-  width: 300px;
+  max-width: 250px;
 }
 .feed-description {
   word-wrap: break-word;
   max-height: 300px;
   overflow: auto;
+}
+.feed-comments-comment {
+  word-wrap: break-word;
+  max-height: 100px;
+  overflow: auto;
+  display: block;
 }
 .clickable {
   color: #1567c0;
