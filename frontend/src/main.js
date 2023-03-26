@@ -37,12 +37,18 @@ export const hideAll = () => {
   hide("error-popup");
 };
 
+// active is the id
+const setActiveNav = (active) => {
+  document.getElementById("nav-job-post").classList.remove("active");
+  document.getElementById("nav-job-feed").classList.remove("active");
+  document.getElementById("nav-profile-me").classList.remove("active");
+  document.getElementById(active).classList.add("active");
+};
+
 const showFeedPage = () => {
   hideAll();
   show("page-job-feed");
-  document.getElementById("nav-job-feed").classList.add("active");
-  document.getElementById("nav-job-post").classList.remove("active");
-  document.getElementById("nav-profile-me").classList.remove("active");
+  setActiveNav("nav-job-feed");
   populateFeed(0, true);
 };
 
@@ -184,25 +190,49 @@ document.getElementById("error-close").addEventListener("click", () => {
 });
 
 // Navbar Job Feed, show job feed page
+document
+  .getElementById("nav-job-feed")
+  .addEventListener("keypress", (event) => {
+    if (event.key === "Enter") {
+      showFeedPage();
+    }
+  });
 document.getElementById("nav-job-feed").addEventListener("click", () => {
   showFeedPage();
 });
 
 // Navbar Create Job, show job post page
-document.getElementById("nav-job-post").addEventListener("click", () => {
+const navSwitchCreateJob = () => {
   hideAll();
   show("page-job-post");
-  document.getElementById("nav-job-post").classList.add("active");
-  document.getElementById("nav-job-feed").classList.remove("active");
-  document.getElementById("nav-profile-me").classList.remove("active");
+  setActiveNav("nav-job-post");
+  document.getElementById("job-post-title").focus();
+};
+document
+  .getElementById("nav-job-post")
+  .addEventListener("keypress", (event) => {
+    if (event.key === "Enter") {
+      navSwitchCreateJob();
+    }
+  });
+document.getElementById("nav-job-post").addEventListener("click", () => {
+  navSwitchCreateJob();
 });
 
 // Navbar Me, show your profile page
-document.getElementById("nav-profile-me").addEventListener("click", () => {
+const navSwitchShowMe = () => {
   showProfile(getUserId());
-  document.getElementById("nav-profile-me").classList.add("active");
-  document.getElementById("nav-job-post").classList.remove("active");
-  document.getElementById("nav-job-feed").classList.remove("active");
+  setActiveNav("nav-profile-me");
+};
+document
+  .getElementById("nav-profile-me")
+  .addEventListener("keypress", (event) => {
+    if (event.key === "Enter") {
+      navSwitchShowMe();
+    }
+  });
+document.getElementById("nav-profile-me").addEventListener("click", () => {
+  navSwitchShowMe();
 });
 
 // Register page, login button
@@ -220,6 +250,11 @@ document.getElementById("login-register").addEventListener("click", () => {
 });
 
 // nav logout button
+document.getElementById("nav-logout").addEventListener("keypress", (event) => {
+  if (event.key === "Enter") {
+    show("logout-popup");
+  }
+});
 document.getElementById("nav-logout").addEventListener("click", () => {
   show("logout-popup");
 });
@@ -238,6 +273,52 @@ document.getElementById("logout").addEventListener("click", () => {
 document.getElementById("logout-close").addEventListener("click", () => {
   hide("logout-popup");
 });
+
+// Create job title input, when Enter pressed
+document
+  .getElementById("job-post-title")
+  .addEventListener("keypress", (event) => {
+    if (event.key === "Enter") {
+      document.getElementById("job-post-image").focus();
+      document.getElementById("job-post-image").click();
+    }
+  });
+
+// Create job image input, when image selected
+document
+  .getElementById("job-post-image")
+  .addEventListener("change", (event) => {
+    if (event.target.files.length > 0) {
+      document.getElementById("job-post-start-date").focus();
+    }
+  });
+
+// Create job start date input, when Enter pressed
+document
+  .getElementById("job-post-start-date")
+  .addEventListener("keypress", (event) => {
+    if (event.key === "Enter") {
+      document.getElementById("job-post-start-time").focus();
+    }
+  });
+
+// Create job start time input, when Enter pressed
+document
+  .getElementById("job-post-start-time")
+  .addEventListener("keypress", (event) => {
+    if (event.key === "Enter") {
+      document.getElementById("job-post-description").focus();
+    }
+  });
+
+// Create job description input, when Enter pressed
+document
+  .getElementById("job-post-description")
+  .addEventListener("keypress", (event) => {
+    if (event.key === "Enter") {
+      document.getElementById("create-job").click();
+    }
+  });
 
 // creating job
 document.getElementById("create-job").addEventListener("click", () => {
@@ -344,7 +425,7 @@ document
     showProfile(getUserId());
   });
 
-// Watch email input
+// Watch email input, when Enter pressed
 document
   .getElementById("watch-search-email")
   .addEventListener("keypress", (event) => {

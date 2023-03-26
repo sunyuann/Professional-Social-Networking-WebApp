@@ -4,6 +4,7 @@
 - Profile shows job likes and comments
 - Profile edit prefills email and name
 - Images get smaller when screen width smaller.
+- Navigation tabs have tabIndex, press Enter is same as click.
 - Navigation tabs have aria-label.
 - Date and time inputs are date and time pickers instead of text.
 - Job description has scroll bar if it's too long.
