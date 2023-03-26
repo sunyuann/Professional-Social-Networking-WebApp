@@ -150,27 +150,32 @@ document
 
 // Register page, register button
 document.getElementById("register-register").addEventListener("click", () => {
-  const registerPassword = document.getElementById("register-password").value;
-  const registerPasswordConfirm = document.getElementById(
-    "register-password-confirm"
-  ).value;
+  const password = document.getElementById("register-password");
+  const passwordConfirm = document.getElementById("register-password-confirm");
   // different password error checking
-  if (registerPassword !== registerPasswordConfirm) {
+  if (password.value !== passwordConfirm.value) {
     errorShow("Passwords do not match!");
     return;
   }
   // hide error if passwords match
   hide("error-popup");
   // register
+  const email = document.getElementById("register-email");
+  const name = document.getElementById("register-name");
   const payload = {
-    email: document.getElementById("register-email").value,
-    password: document.getElementById("register-password").value,
-    name: document.getElementById("register-name").value,
+    email: email.value,
+    password: password.value,
+    name: name.value,
   };
   apiCall("auth/register", "POST", payload, (data) => {
     setToken(data.token, data.userId);
+    password.value = "";
+    passwordConfirm.value = "";
+    email.value = "";
+    name.value = "";
+    show("page-login");
+    hide("page-register");
   });
-  //document.getElementById("register-form").submit();
 });
 
 // Error popup, close button
