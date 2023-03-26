@@ -59,11 +59,7 @@ export const apiCall = (path, method, body, success) => {
     .then((response) => {
       response.json().then((data) => {
         if (data.error) {
-          if (getUserId()) {
-            errorShow(data.error);
-          } else {
-            console.log("API call, but you logged out before it finished");
-          }
+          errorShow(data.error);
         } else {
           if (success) {
             return Promise.resolve(success(data));
