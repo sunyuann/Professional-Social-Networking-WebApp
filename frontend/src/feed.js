@@ -100,6 +100,8 @@ const updateJob = (feedDom, jobDetail) => {
   feedDom.querySelector(".feed-created").innerText = createStr;
 };
 
+// Clones the hidden node and edits to fit jobDetail
+// If editable === true, Edit and Delete buttons are shown
 export const createJobElement = (jobDetail, editable = false) => {
   const baseFeedItem = document.getElementById("feed-item");
   const feedDom = cloneNode(baseFeedItem);
@@ -366,6 +368,7 @@ const liveUpdate = (start, nodes, jobIds, id = null) => {
   }, 1000);
 };
 
+// Fetch feed and populate, doesn't switch to feed page
 // clear === true will remove existing feed items before adding new
 export const populateFeed = (start, clear = true) => {
   if (clear) {
@@ -415,6 +418,7 @@ export const populateFeed = (start, clear = true) => {
 //////////////////////
 // Global variables //
 //////////////////////
+
 // The start index you should give /job/feed to get next feed items
 var currentFeedIndex = 0;
 export const getCurrentFeedIndex = () => {
