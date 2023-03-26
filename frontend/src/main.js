@@ -28,6 +28,8 @@ const hide = (element) => {
 const updateJob = (feedDom, jobDetail) => {
   // Update fields
   feedDom.querySelector(".feed-image").src = jobDetail.image;
+  feedDom.querySelector(".feed-image").alt =
+    "Image of job with title " + jobDetail.title;
   feedDom.querySelector(".feed-title").innerText = jobDetail.title;
   feedDom.querySelector(".feed-start").innerText = jobDetail.start;
   feedDom.querySelector(".feed-description").innerText = jobDetail.description;
@@ -434,6 +436,7 @@ const showProfile = (userId) => {
     } else {
       pp.querySelector("#profile-image").src = user.image;
     }
+    pp.querySelector("#profile-image").alt = "Profile image of " + user.name;
     // Edit Button
     const btnEdit = document.getElementById("profile-edit");
     if (userId === getUserId()) {
