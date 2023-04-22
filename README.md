@@ -1,3 +1,5 @@
+Achieved total mark of 95%.
+
 # Assessment 3 - Vanilla JS: LurkForWork
 
 1. Background & Motivation
